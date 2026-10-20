@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-t="light"><head><meta charset="utf-8"><title>ECHOO</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--red:#D8082F;--rt:#D8082F;--on:#EEE6DD;--bg:#EEE6DD;--bg2:#E6DCCF;--bg3:#DBCFC0;--fg:#1E140B;--mu:#6b5d52;--ln:rgba(30,20,11,.18);--lns:rgba(30,20,11,.5);--ok:#2E7D4F;--wn:#B8860B;--dn:#D8082F;
+--disp:"Anton","Impact","Haettenschweiler","Arial Narrow Bold",sans-serif;--body:"Archivo",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color-scheme:light}
+:root[data-t="dark"]{--bg:#17110d;--bg2:#1f1812;--bg3:#2b2219;--fg:#EEE6DD;--mu:#a79a8d;--ln:rgba(238,230,221,.15);--lns:rgba(238,230,221,.45);--ok:#58c487;--wn:#e0b042;color-scheme:dark}
+*{box-sizing:border-box;margin:0;scrollbar-width:thin;scrollbar-color:var(--lns) transparent}[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font:14px/1.5 var(--body);display:flex;overflow:hidden;-webkit-font-smoothing:antialiased}
+body::after{content:"";position:fixed;inset:4px;border:1px solid var(--red);opacity:.45;pointer-events:none;z-index:5}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input,select{font:inherit;color:var(--fg);background:transparent;border:2px solid var(--fg);border-radius:0;padding:9px 10px;width:100%}
+select option{background:var(--bg);color:var(--fg)}input::placeholder{color:var(--mu)}
+:focus-visible{outline:3px solid var(--rt);outline-offset:2px}
+small,.mu{color:var(--mu)}
+.disp{font-family:var(--disp);font-weight:400;text-transform:uppercase;letter-spacing:.01em;line-height:.95}
+.tag{font:800 11px/1 var(--body);letter-spacing:.14em;text-transform:uppercase}
+.btn{display:inline-flex;align-items:center;justify-content:space-between;gap:14px;min-height:40px;padding:0 16px;border:2px solid currentColor;font:400 16px/1 var(--disp);letter-spacing:.04em;text-transform:uppercase;transition:background .2s,color .2s,border-color .2s}
+.btn:hover{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn.red{background:var(--red);color:var(--on);border-color:var(--red)}.btn.red:hover{background:transparent;color:var(--rt)}
+.btn.sm{min-height:30px;padding:0 10px;font-size:13px}.btn.go::after{content:"↗";font-family:var(--body);font-weight:800}
+.ib{width:32px;height:32px;display:grid;place-items:center;color:var(--mu);flex:none;transition:background .15s,color .15s}
+.ib:hover{background:var(--bg3);color:var(--fg)}.ib svg,.cb svg,.ri svg,.hi svg{fill:currentColor}.ib svg{width:19px;height:19px}.ib.off{color:var(--rt)}
+.nb{background:var(--red);color:var(--on);padding:1px 6px;font:800 10px var(--body);margin-left:6px}
+@keyframes rv{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.rv{animation:rv .3s ease both}
+html[data-rm] *,html[data-rm] *::before{animation:none!important;transition:none!important}
+@media(prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}}
+/* trilho de servidores */
+#rail{width:68px;flex:none;background:var(--red);color:var(--on);display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 0;overflow-y:auto;scrollbar-width:none;z-index:6}
+.rw{position:relative}.rw.on::before{content:"";position:absolute;left:-12px;top:6px;width:4px;height:32px;background:var(--on)}
+.ri{width:44px;height:44px;border:2px solid rgba(238,230,221,.55);color:var(--on);display:grid;place-items:center;font:400 19px var(--disp);position:relative;overflow:hidden;transition:background .2s,color .2s,border-color .2s}
+.ri:hover,.rw.on .ri{background:var(--on);color:var(--red);border-color:var(--on)}.ri svg{width:20px;height:20px}.ri img{width:100%;height:100%;object-fit:cover}
+.rs{width:28px;height:1px;background:rgba(238,230,221,.5)}
+.bd{position:absolute;right:2px;bottom:2px;width:9px;height:9px;background:var(--on);border:2px solid var(--red)}
+/* coluna lateral */
+#side{width:248px;flex:none;background:var(--bg2);border-right:1px solid var(--lns);display:flex;flex-direction:column}
+#sh{padding:12px;border-bottom:1px solid var(--ln);min-height:56px;display:flex;align-items:center}
+#sh input{padding:7px 10px;font-size:13px;border-width:0 0 2px 0}
+.svh{display:flex;align-items:center;justify-content:space-between;width:100%;text-align:left;font:400 22px/1 var(--disp);text-transform:uppercase;padding:4px 2px}
+.svh svg{width:20px;height:20px;fill:currentColor;flex:none}.svh span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scroll{flex:1;overflow-y:auto;padding:6px 8px 12px}
+.lb{display:flex;justify-content:space-between;align-items:center;color:var(--mu);padding:16px 6px 6px;border-top:1px solid var(--ln);margin-top:8px}.lb:first-child{border-top:0;margin-top:0}
+.it{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:6px 8px;color:var(--mu);border-left:3px solid transparent}
+.it:hover{background:var(--bg3);color:var(--fg)}.it.sel{background:var(--bg3);color:var(--fg);border-left-color:var(--red)}
+.it .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.it .pl{color:var(--rt);font-weight:800;font-size:11px}
+.hi{display:grid;place-items:center;width:20px}.hi svg{width:17px;height:17px}
+.vp{display:flex;align-items:center;gap:8px;padding:2px 8px 2px 38px;color:var(--mu);font-size:12px}
+#vc{padding:8px 12px;border-top:1px solid var(--lns);display:flex;align-items:center;gap:8px;background:var(--red);color:var(--on)}
+#vc small{color:var(--on);opacity:.85;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#vc .ib{color:var(--on)}#vc .ib:hover{background:var(--on);color:var(--red)}
+#user{display:flex;align-items:center;gap:4px;padding:8px;border-top:1px solid var(--lns)}
+.uarea{display:flex;align-items:center;gap:8px;flex:1;min-width:0;text-align:left;padding:4px}.uarea:hover{background:var(--bg3)}
+.un{flex:1;min-width:0}.un b,.un small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.un b i{font-style:normal;color:var(--mu);font-weight:400;margin-left:4px;font-size:11px}.un small{font-size:11px}
+.av{--s:36px;width:var(--s);height:var(--s);border-radius:50%;object-fit:cover;display:grid;place-items:center;flex:none;font:400 calc(var(--s)*.5) var(--disp);color:#EEE6DD;cursor:pointer}
+.avw{position:relative;display:flex}.dot{position:absolute;right:-3px;bottom:-3px;width:12px;height:12px;border-radius:50%;background:var(--mu);border:3px solid var(--bg2)}
+.dot.online{background:var(--ok)}.dot.idle{background:var(--wn)}.dot.dnd{background:var(--dn)}
+/* área principal */
+#main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg)}
+body.incall #main{flex:0 0 380px;border-left:1px solid var(--lns)}
+#home,#chatcol{flex:1;display:flex;flex-direction:column;min-height:0}
+#htop{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:18px 28px 12px;border-bottom:1px solid var(--lns)}
+#htop h1{font-size:46px;margin-top:6px}
+#tabs{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.tb{font:800 11px/1 var(--body);letter-spacing:.14em;text-transform:uppercase;padding:8px 0;color:var(--mu);border-bottom:2px solid transparent}
+.tb:hover{color:var(--fg)}.tb.on{color:var(--fg);border-bottom-color:var(--red)}
+#hwrap{flex:1;display:flex;min-height:0}
+#hl{flex:1;min-width:0;padding:18px 28px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+#hq{max-width:420px;padding:8px 10px;border-width:0 0 2px 0}
+.fr{display:flex;align-items:center;gap:14px;padding:12px 6px;border-top:1px solid var(--ln)}.fr:hover{background:var(--bg2)}
+.fr .n{width:26px;color:var(--mu)}.fr .un b{font-size:15px}
+.rnd{width:36px;height:36px;border:2px solid var(--ln)}.rnd:hover{border-color:var(--fg)}.rnd.ok{color:var(--ok)}.rnd.no{color:var(--rt)}
+#act{width:290px;flex:none;border-left:1px solid var(--lns);padding:18px;overflow-y:auto}body.incall #act{display:none}
+#act h2{font-size:26px;margin:6px 0 12px}
+.ac{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--lns);margin-top:10px}.ac .un b{font-size:13px}
+.acs{display:flex}.acs .av{margin-left:-8px;border:2px solid var(--bg)}.acs .av:first-child{margin-left:0}
+.afr{display:flex;gap:10px;max-width:520px}.afr .btn{flex:none}
+#top{min-height:60px;padding:10px 20px;border-bottom:1px solid var(--lns);display:flex;align-items:center;gap:12px}
+.tt{flex:1;min-width:0;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}.tt b{font-size:28px}.tt small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+#msgs{flex:1;overflow-y:auto;padding:10px 20px 14px}
+.m{display:flex;gap:14px;margin-top:16px;padding:2px 6px}.m.c{margin-top:0}.m:hover{background:var(--bg2)}.sp0{width:36px;flex:none}
+.mh{display:flex;align-items:baseline;gap:10px}.mh b{font:800 12px var(--body);letter-spacing:.06em;text-transform:uppercase}.mh small{font-size:11px}.tx{overflow-wrap:anywhere;font-size:15px}
+.wl{padding:36px 6px 20px;border-bottom:1px solid var(--ln)}.wl h2{font-size:54px;margin:8px 0}.wl p{max-width:50ch;color:var(--mu)}
+#f{padding:0 20px 18px}#f input{padding:13px 14px;font-size:15px}
+/* call */
+#callcol{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--red);color:var(--on)}
+#ct{padding:16px 24px 0;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1px solid rgba(238,230,221,.5);padding-bottom:10px}#ct b{font-size:30px}
+#stage{flex:1;min-height:0;position:relative;background:#000;display:flex;margin:14px 24px 0;border:1px solid rgba(238,230,221,.6)}
+#callcol:not(.live) #stage{display:none}
+video{width:100%;height:100%;object-fit:contain;background:#000}
+#mine{position:absolute;inset:0;display:grid;place-content:center;gap:12px;text-align:center;background:#1E140B;color:var(--on);padding:24px}#mine b{font-size:40px}#mine p{opacity:.8;max-width:38ch;margin:0 auto}
+#vbar{position:absolute;left:0;right:0;bottom:0;display:flex;gap:8px;align-items:center;padding:14px;background:linear-gradient(transparent,rgba(0,0,0,.8));opacity:0;transition:opacity .2s;color:#EEE6DD}
+#stage:hover #vbar,#stage:fullscreen #vbar{opacity:1}.sp{flex:1}#vbar .ib{color:#EEE6DD}#vbar .ib:hover{background:#EEE6DD;color:#1E140B}
+#stage:fullscreen{margin:0;border:0;background:#000}
+#tiles{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-content:center;padding:20px 24px;flex:1}
+#callcol.live #tiles{flex:0 0 112px;padding:12px 24px;gap:10px;align-content:flex-start;overflow:hidden}
+.tile{width:210px;height:150px;border:1px solid rgba(238,230,221,.6);display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center;position:relative}
+.tile .av{--s:72px;border:2px solid var(--on)}.tile span{font:800 12px var(--body);letter-spacing:.08em;text-transform:uppercase}
+.tile.speaking{background:rgba(238,230,221,.16);box-shadow:inset 0 0 0 3px var(--on)}
+.mm{position:absolute;right:8px;top:6px;font-style:normal}.mm svg{width:18px;height:18px;fill:currentColor}
+#callcol.live .tile{width:128px;height:86px;gap:4px}#callcol.live .tile .av{--s:36px}#callcol.live .tile span{font-size:10px}
+#ctl{display:flex;gap:12px;justify-content:center;padding:14px;border-top:1px solid rgba(238,230,221,.5)}
+.cb{width:52px;height:52px;border:2px solid var(--on);color:var(--on);display:grid;place-items:center;transition:background .2s,color .2s}
+.cb:hover{background:var(--on);color:var(--red)}.cb svg{width:24px;height:24px}.cb.off{background:var(--on);color:var(--red)}.cb.live{background:#1E140B;border-color:#1E140B}.cb.end{background:#1E140B;border-color:#1E140B;color:var(--on)}.cb.end:hover{background:var(--on);color:#1E140B}
+/* ligação */
+#ring{position:fixed;top:18px;right:18px;width:330px;background:var(--red);color:var(--on);border:2px solid var(--on);padding:16px;display:grid;gap:12px;z-index:50;box-shadow:6px 6px 0 rgba(0,0,0,.35)}
+#ring .rr{display:flex;align-items:center;gap:12px}#ring .rr b{font-size:30px}#ring .rb{display:flex;gap:10px}#ring .btn{flex:1;color:var(--on)}
+#ring .rr .av{border:2px solid var(--on)}@keyframes pl{0%,100%{box-shadow:0 0 0 0 rgba(238,230,221,.6)}50%{box-shadow:0 0 0 10px rgba(238,230,221,0)}}#ring .av{animation:pl 1.4s infinite}
+/* popover, modal, toast */
+#pop{position:fixed;left:8px;bottom:62px;width:300px;background:var(--bg);border:2px solid var(--fg);z-index:35;padding-bottom:6px}
+#pop.sv{left:76px;top:56px;bottom:auto;width:230px;padding:6px}
+#pop .bn{height:84px;border-bottom:1px solid var(--fg)}#pop .pc{margin:-32px 14px 0;position:relative;display:flex}#pop .pc .av{--s:64px;border:4px solid var(--bg)}
+#pop .pc .dot{left:50px;bottom:0;width:18px;height:18px;border:4px solid var(--bg)}#pop .pb{padding:8px 14px 10px}#pop .pb b{font-size:24px}
+.pl2{margin:6px 8px;border-top:1px solid var(--ln);padding-top:4px}
+.pl2 button,#pop.sv button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;padding:7px 8px}.pl2 button:hover,#pop.sv button:hover{background:var(--bg3)}
+.pl2 svg,#pop.sv svg{width:17px;height:17px;fill:currentColor}.rd{color:var(--rt)}
+#modal{position:fixed;inset:0;background:rgba(23,17,13,.7);display:none;place-items:center;z-index:40}#modal.on{display:grid}
+#mf{background:var(--bg);border:2px solid var(--fg);padding:22px;width:min(500px,92vw);max-height:92vh;overflow:auto;display:grid;gap:14px;animation:rv .25s ease both}#mf.wide{width:min(660px,94vw)}
+#mf h3{font-size:30px}#mf label.ck{display:flex;gap:8px;align-items:center}#mf label.ck input{width:auto}
+.fl{display:grid;gap:6px}.row{display:flex;gap:10px;justify-content:flex-end}.row2{display:flex;gap:10px;flex-wrap:wrap}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:260px;overflow:auto}
+.src{position:relative;display:grid;gap:4px;padding:6px;border:2px solid var(--ln);cursor:pointer;font-size:12px}.src input{position:absolute;opacity:0}.src img{width:100%;background:#000}.src span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.src:has(input:checked){border-color:var(--red);background:var(--bg2)}
+.bn{height:110px;background-size:cover;background-position:center;border:1px solid var(--lns)}
+.pc2{display:flex;align-items:flex-end;gap:12px;margin:-36px 14px 0;position:relative}.pc2 .av{border:5px solid var(--bg)}
+#st{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:12px 20px;font-weight:600;font-size:13px;max-width:90vw;z-index:60}#st:empty{display:none}
+/* configurações */
+#set{position:fixed;inset:12px;background:var(--bg);border:2px solid var(--fg);display:grid;grid-template-columns:260px 1fr;z-index:30;animation:rv .25s ease both}
+#sn{background:var(--bg2);border-right:1px solid var(--lns);padding:18px 12px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+#sn .sc{display:flex;align-items:center;gap:10px;padding:0 6px 14px;border-bottom:1px solid var(--ln);margin-bottom:10px}
+#sn .tag{padding:12px 6px 4px}
+.sni{text-align:left;padding:8px 10px;border-left:3px solid transparent;color:var(--mu)}.sni:hover{background:var(--bg3);color:var(--fg)}.sni.on{background:var(--bg3);color:var(--fg);border-left-color:var(--red)}.sni.rd{color:var(--rt)}
+#sc{overflow-y:auto;padding:26px 40px 40px}#sc>div{max-width:640px;display:grid;gap:16px}
+#sc h1{font-size:54px}#sx{position:absolute;right:18px;top:16px;display:grid;justify-items:center;gap:2px;z-index:2}
+#sx .ib{border:2px solid var(--fg);color:var(--fg);width:36px;height:36px}
+.sec{display:grid;gap:10px;padding-top:14px;border-top:1px solid var(--lns)}.sec>.tag{color:var(--rt)}
+.opts{display:flex;gap:10px;flex-wrap:wrap}
+.opt{border:2px solid var(--ln);padding:10px 14px;min-width:120px;text-align:left;display:grid;gap:8px}.opt:hover{border-color:var(--fg)}.opt.on{border-color:var(--red);background:var(--bg2)}
+.pv{height:38px;border:1px solid var(--lns);display:flex}.pv i{flex:1}
+.sw{width:44px;height:44px;border:2px solid var(--ln);position:relative}.sw.on{border-color:var(--fg)}.sw.on::after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:#EEE6DD;font-weight:800}
+.tg{width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:10px 0;border-top:1px solid var(--ln)}
+.sw2{width:46px;height:24px;border:2px solid var(--fg);position:relative;flex:none}.sw2::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;background:var(--fg);transition:transform .2s}.sw2.on{background:var(--red);border-color:var(--red)}.sw2.on::after{transform:translateX(22px);background:var(--on)}
+.sr{display:flex;align-items:center;gap:10px;padding:8px 6px;border-top:1px solid var(--ln)}.sr .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cd{width:14px;height:14px;flex:none}.chips{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.ch2{padding:2px 8px;border:2px solid var(--c);color:var(--c);font:800 10px var(--body);letter-spacing:.08em;text-transform:uppercase;opacity:.6}.ch2.on{opacity:1;background:var(--c);color:#EEE6DD}
+.upi{width:80px;height:80px;border:2px solid var(--fg);background:var(--bg3) center/cover;display:grid;place-items:center;cursor:pointer;color:var(--mu);flex:none}.upi svg{width:28px;height:28px;fill:currentColor}.upi.has svg{display:none}
+.upl{display:flex;align-items:center;gap:14px}
+@media(max-width:820px){#set{grid-template-columns:1fr}#sn{flex-direction:row;overflow-x:auto;padding:8px}#sn .sc,#sn .tag{display:none}#sc{padding:20px}}
+#auth{position:fixed;inset:0;z-index:80;background:var(--bg);display:grid;grid-template-columns:1fr 1fr}
+#auth .ah{background:var(--red);color:var(--on);padding:40px;display:flex;flex-direction:column;justify-content:space-between}
+#auth .ah b{font-size:clamp(80px,16vw,230px);line-height:.85}
+#auth .ab{align-self:center;justify-self:center;width:min(380px,86vw);display:grid;gap:16px}#auth h1{font-size:44px}
+.err{color:var(--rt);min-height:20px;font-weight:600;font-size:13px}
+#net{position:fixed;top:0;left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:6px 16px;font:800 11px var(--body);letter-spacing:.12em;text-transform:uppercase;z-index:70}
+@media(max-width:760px){#auth{grid-template-columns:1fr;grid-template-rows:auto 1fr}#auth .ah{padding:20px}#auth .ah b{font-size:72px}}
+.lk{color:var(--rt);font-weight:600;text-decoration:underline;text-underline-offset:3px;padding:0}.rq{color:var(--rt);font-style:normal}.alt{font-size:13px;line-height:1.6}
+.reccode{font:800 24px/1.3 var(--body);letter-spacing:.1em;border:2px dashed var(--fg);padding:14px;text-align:center;user-select:all}
+#upd{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:var(--red);color:var(--on);padding:8px 8px 8px 16px;display:flex;gap:14px;align-items:center;z-index:65;font-weight:600;box-shadow:4px 4px 0 rgba(0,0,0,.3)}
+#upd .btn{color:var(--on)}
+</style></head><body>
+<nav id="rail" aria-label="Servidores"></nav>
+<aside id="side">
+  <div id="sh"><form id="sf" style="width:100%"><input id="q" placeholder="Buscar ou iniciar conversa" autocomplete="off" aria-label="Buscar"></form><button id="svh" class="svh" data-act="smenu" hidden></button></div>
+  <div class="scroll" id="sl"></div>
+  <div id="vc" hidden><div class="un"><b class="tag">Voz conectada</b><small id="cn"></small></div><button class="ib" data-act="leave"></button></div>
+  <div id="user"><button class="uarea" data-act="upop"><span id="uav"></span><span class="un"><b><span id="myname"></span><i id="mytag"></i></b><small id="mystat"></small></span></button>
+    <button class="ib" data-act="mic"></button><button class="ib" data-act="deaf"></button><button class="ib" data-act="set"></button></div>
+</aside>
+<section id="callcol" hidden>
+  <div id="ct"><div><span class="tag">Em chamada</span><br><b class="disp" id="ctn"></b></div></div>
+  <div id="stage"><video id="vid" autoplay playsinline disablepictureinpicture></video>
+    <div id="mine" hidden><span class="tag">Transmissão ao vivo</span><b class="disp" id="mineq"></b><p>Sua tela está sendo enviada. A prévia fica desligada para não pesar nem causar efeito espelho.</p><div><button class="btn sm" data-act="stopv" style="color:var(--on)">Parar transmissão</button></div></div>
+    <div id="vbar"><span class="tag" id="vlabel"></span><span class="sp"></span><button class="ib" data-act="fs" id="fsb" title="Tela cheia"></button></div></div>
+  <div id="tiles"></div>
+  <div id="ctl"><button class="cb" data-act="mic"></button><button class="cb" data-act="deaf"></button><button class="cb" data-act="scr" id="scr"></button><button class="cb end" data-act="leave"></button></div>
+</section>
+<section id="main">
+  <div id="home">
+    <div id="htop"><div><span class="tag mu">01 — Início</span><h1 class="disp">Amigos</h1></div><nav id="tabs"></nav></div>
+    <div id="hwrap"><div id="hl"><input id="hq" placeholder="Buscar amigo" autocomplete="off" aria-label="Buscar amigo"><div id="hb"></div></div><aside id="act"></aside></div>
+  </div>
+  <div id="chatcol" hidden>
+    <div id="top"><div class="tt"><b class="disp" id="title"></b><small id="tdesc"></small></div><button class="ib" data-act="call" id="callb" hidden></button></div>
+    <div id="msgs"></div>
+    <form id="f"><input id="inp" placeholder="Escreva uma mensagem" autocomplete="off" aria-label="Mensagem"></form>
+  </div>
+</section>
+<div id="auth" hidden></div><div id="net" hidden>Reconectando ao servidor…</div>
+<div id="upd" hidden><span id="updt"></span><button class="btn sm" id="updb"></button></div>
+<div id="ring" hidden></div><div id="audios" hidden></div><div id="modal"></div><div id="pop" hidden></div><div id="set" hidden></div><div id="st" role="status"></div>
+<script src="config.js"></script>
+<script>
+const $=i=>document.getElementById(i);
+const L=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const COL=['#D8082F','#8a5a2b','#2E7D4F','#1F4FD8','#6B3FD1','#8a6508'];
+const colr=s=>COL[[...String(s)].reduce((a,c)=>a+c.charCodeAt(0),0)%COL.length];
+const okImg=(a,max)=>typeof a=='string'&&a.length<max&&/^data:image\/jpeg;base64,[A-Za-z0-9+\/=]+$/.test(a)?a:'';
+const CODE=/^[A-Za-z0-9_-]{3,30}$/;
+const SN={online:'Disponível',idle:'Ausente',dnd:'Não perturbe',offline:'Offline',invisible:'Invisível'};
+const P={mic:'M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z',
+ head:'M12 3a9 9 0 0 0-9 9v7a2 2 0 0 0 2 2h2v-8H5v-1a7 7 0 0 1 14 0v1h-2v8h2a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z',
+ scr:'M3 4h18a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1h-7v2h3v2H7v-2h3v-2H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1zm1 2v9h16V6H4z',
+ hang:'M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08a.96.96 0 0 1-.29-.7c0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28a11.3 11.3 0 0 0-2.67-1.85.99.99 0 0 1-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z',
+ phone:'M6.62 10.79a15.05 15.05 0 0 0 6.59 6.59l2.2-2.2a1 1 0 0 1 1.02-.24c1.12.37 2.33.57 3.57.57a1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1.02l-2.2 2.2z',
+ gear:'M19.14 12.94a7.1 7.1 0 0 0 .06-.94c0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7 7 0 0 0-1.62-.94l-.36-2.54a.48.48 0 0 0-.48-.41h-3.84a.48.48 0 0 0-.48.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87a.48.48 0 0 0 .12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1 1 12 8.4a3.6 3.6 0 0 1 0 7.2z',
+ full:'M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z',
+ plus:'M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z',
+ chat:'M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z',
+ check:'M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z',
+ close:'M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z',
+ trash:'M6 19a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z',
+ vol:'M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z',
+ hash:'M5.41 21 6.12 17H2.12l.35-2h4l1.06-6h-4l.35-2h4l.7-4h2l-.7 4h6l.7-4h2l-.7 4h4l-.35 2h-4l-1.06 6h4l-.35 2h-4l-.7 4h-2l.7-4h-6l-.7 4h-2zM9.53 9l-1.06 6h6l1.06-6h-6z',
+ chev:'M7 10l5 5 5-5z',
+ cam:'M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4zM9 2 7.17 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3.17L15 2H9z',
+ user:'M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z'};
+const ic=(n,off)=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${P[n]}"/>${off?'<path d="M4 4l16 16" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" fill="none"/>':''}</svg>`;
+const Q={'720':[1280,720,30,3e6],'1080':[1920,1080,30,6e6],'1080p60':[1920,1080,60,9e6],'1440':[2560,1440,60,16e6]};
+const PAL={echoo:['ECHOO Vermelho','#D8082F','#FF4A67'],forest:['Floresta','#2F6B4F','#5FB88B'],cobalt:['Cobalto','#1F4FD8','#7FA2FF'],amber:['Âmbar','#A85F00','#F0A63A'],violet:['Violeta','#6B3FD1','#B79CFF']};
+
+/* ---------- tema e configurações ---------- */
+let cfg={theme:'sys',pal:'echoo',rm:false,mic:'',q:'1080',ns:true,...L('d2set',{})};
+function applyTheme(){const dark=cfg.theme=='dark'||(cfg.theme=='sys'&&matchMedia('(prefers-color-scheme: dark)').matches),p=PAL[cfg.pal]||PAL.echoo,r=document.documentElement;
+  r.dataset.t=dark?'dark':'light';r.style.setProperty('--red',p[1]);r.style.setProperty('--rt',dark?p[2]:p[1]);r.toggleAttribute('data-rm',!!cfg.rm)}
+const saveCfg=()=>{try{localStorage.setItem('d2set',JSON.stringify(cfg))}catch(e){}};
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>cfg.theme=='sys'&&applyTheme());applyTheme();
+
+/* ---------- estado ---------- */
+const DEFAULT_SERVER=window.ECHOO_SERVER||"";
+const APP_VERSION="__ECHOO_VERSION__";   // o servidor troca isto pela versão atual ao entregar o app
+let me=null,friends=[],reqs=[],srvs=[],hist={},pcache={},sres=null,ICE=[{urls:'stun:stun.l.google.com:19302'}],ws=null,wsTry=0,tok=L('d2tok',''),pendingAuth=null,authMode='login',srvModal=null,booted=false,pendingRec=null;
+let online={},active={},muted={},cur=null,cs=null,tab='on',inCall=null,mic=null,pcs={},pendIce={},screenStream=null,shareQ='1080',
+ deaf=false,micOff=false,preMic=false,AC=null,an={},spk=null,rq=0,ringIn=null,ringOut=null,rt=null,setSec='conta',pend={a:'',b:''},lastCh={};
+const save=()=>{},saveNow=()=>{};
+const sched=()=>{if(!rq)rq=requestAnimationFrame(()=>{rq=0;renderAll()})};
+const st=t=>{$('st').textContent=t;setTimeout(()=>{if($('st').textContent==t)$('st').textContent=''},5000)};
+function modal(html,ok,label,noCancel){const m=$('modal');m.onclick=m.oninput=null;
+  m.innerHTML='<form id="mf">'+html+'<div class="row"><button type="button" class="btn" id="mx">Fechar</button><button class="btn red">'+(label||'OK')+'</button></div></form>';
+  m.classList.add('on');$('mx').hidden=!!noCancel;$('mx').onclick=()=>m.classList.remove('on');
+  $('mf').onsubmit=e=>{e.preventDefault();const fd=new FormData($('mf'));m.classList.remove('on');ok(fd)};const i=m.querySelector('input');i&&i.focus()}
+const confirmM=(t,fn,l)=>modal(`<h3 class="disp">${esc(t)}</h3>`,fn,l||'Confirmar');
+const bu={};function burl(d){if(!d)return'';if(bu[d])return bu[d];try{const b=atob(d.split(',')[1]),u=new Uint8Array(b.length);for(let i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return bu[d]=URL.createObjectURL(new Blob([u],{type:'image/jpeg'}))}catch(e){return''}}
+const imgJpeg=(f,w,h,q)=>new Promise(r=>{const i=new Image();i.onload=()=>{const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d'),s=Math.max(w/i.width,h/i.height),sw=w/s,sh=h/s;x.drawImage(i,(i.width-sw)/2,(i.height-sh)/2,sw,sh,0,0,w,h);URL.revokeObjectURL(i.src);r(c.toDataURL('image/jpeg',q))};i.src=URL.createObjectURL(f)});
+const bnStyle=(b,c)=>b?`background-image:url('${burl(b)}')`:'background:'+colr(c);
+const prof=c=>c==me.code?me:(friends.find(f=>f.code==c)||reqs.find(r=>r.code==c)||pcache[c]||{});
+const nameOf=c=>prof(c).name&&prof(c).name!=c?prof(c).name:((srvs.find(s=>s.names&&s.names[c])||{names:{}}).names[c])||c;
+function av(c,sz,name,nolink){const p=prof(c),n=String(p.name||name||c),s=sz?`--s:${sz}px;`:'',l=nolink?'':`data-act="card" data-c="${esc(c)}"`;
+  return p.avatar?`<img class="av" ${l} style="${s}" src="${burl(p.avatar)}" alt="">`:`<div class="av" ${l} style="${s}background:${colr(c)}">${esc(n[0].toUpperCase())}</div>`}
+const myStat=()=>me.status=='invisible'?'offline':me.status;
+function stat(c){const f=friends.find(x=>x.code==c);if(!online[c]||!f)return 'offline';return ['idle','dnd'].includes(f.status)?f.status:(f.status=='offline'?'offline':'online')}
+
+/* ---------- servidores ---------- */
+const srvById=id=>srvs.find(s=>s.id==id);
+const mem=(s,c)=>s.members.find(m=>m.c==c);
+const canManage=(s,c)=>{c=c||me.code;if(s.owner==c)return true;const m=mem(s,c);return !!m&&m.r.some(r=>(s.roles.find(x=>x.id==r)||{}).manage)};
+const roleColor=(s,c)=>{if(c==s.owner)return s.roles[0]?s.roles[0].color:'';const m=mem(s,c),r=m&&s.roles.find(x=>m.r.includes(x.id));return r?r.color:''};
+const srvCh=(s,c)=>({id:s.id+':'+c.id,name:c.n,members:s.members.map(m=>m.c),k:c.t,sid:s.id,sname:s.name});
+const dm=code=>({id:[me.code,code].sort().join('+'),name:nameOf(code),members:[me.code,code],k:'dm'});
+function fixCur(){if(cur&&cur.sid){const s=srvById(cur.sid),id=cur.id.split(':')[1];if(!s){cur=null;cs=null}else if(!s.chans.find(c=>c.id==id)){const c=s.chans.find(c=>c.t=='t');cur=c?srvCh(s,c):null}}if(cs&&!srvById(cs)){cs=null;cur=null}}
+function chByKey(k){if(k.includes(':')){const[sid,cid]=k.split(':'),s=srvById(sid),c=s&&s.chans.find(x=>x.id==cid);return c&&c.t=='v'?{ch:srvCh(s,c),label:s.name+' · '+c.n}:null}
+  const o=k.split('+').find(x=>x!=me.code),f=o&&friends.find(x=>x.code==o);return f&&k==dm(o).id?{ch:dm(o),label:'Chamada com '+f.name}:null}
+
+/* ---------- servidor central ---------- */
+function srvBase(){const s=(L('d2srv','')||DEFAULT_SERVER||'').toString().trim().replace(/\/+$/,'');if(s)return s;return location.protocol.startsWith('http')?location.origin:''}
+const wsend=o=>{if(ws&&ws.readyState==1)ws.send(JSON.stringify(o))};
+function setConn(on){$('net').hidden=on||!me}
+function connect(){const b=srvBase();if(!b)return showAuth('Informe o endereço do servidor.');
+  try{ws=new WebSocket(b.replace(/^http/,'ws')+'/ws')}catch(e){return showAuth('Endereço do servidor inválido.')}
+  ws.onopen=()=>{wsTry=0;if(tok)wsend({t:'resume',token:tok});else if(pendingAuth){wsend(pendingAuth);pendingAuth=null}};
+  ws.onmessage=e=>{let d;try{d=JSON.parse(e.data)}catch(x){return}onMsg(d)};
+  ws.onclose=()=>{setConn(false);if(me||tok){wsTry++;setTimeout(connect,Math.min(1000*2**wsTry,15000))}else if(pendingAuth){pendingAuth=null;showAuth('Não foi possível conectar ao servidor.')}};
+  ws.onerror=()=>{}}
+function showAuth(msg){const a=$('auth');a.hidden=false;const needSrv=!location.protocol.startsWith('http'),m=authMode;
+  const T={login:['Entrar','Bem-vindo de volta!','Que bom te ver de novo.'],reg:['Criar conta','Crie sua conta','Leva menos de um minuto.'],forgot:['Recuperar acesso','Redefinir senha','Use o código de recuperação que você recebeu ao criar a conta.']}[m];
+  a.innerHTML=`<div class="ah"><span class="tag">Chat e comunidades</span><b class="disp">ECHOO</b></div><form id="af2" class="ab"><span class="tag mu">${T[0]}</span><h1 class="disp">${T[1]}</h1><p class="mu">${T[2]}</p>
+  ${needSrv?`<label class="fl"><span class="tag">Servidor</span><input id="a_srv" value="${esc(srvBase())}" placeholder="https://seu-servidor" autocomplete="off"></label>`:''}
+  <label class="fl"><span class="tag">Nome de usuário <i class="rq">*</i></span><input id="a_user" autocomplete="username" maxlength="20" required></label>
+  ${m=='reg'?`<label class="fl"><span class="tag">Nome de exibição</span><input id="a_name" maxlength="20" placeholder="Como os amigos vão te ver"></label>`:''}
+  ${m=='forgot'?`<label class="fl"><span class="tag">Código de recuperação <i class="rq">*</i></span><input id="a_code" placeholder="XXXX-XXXX-XXXX-XXXX" autocomplete="off" required></label>`:''}
+  <label class="fl"><span class="tag">${m=='forgot'?'Nova senha':'Senha'} <i class="rq">*</i></span><input id="a_pass" type="password" autocomplete="${m=='login'?'current-password':'new-password'}" required></label>
+  ${m=='login'?'<div><button type="button" class="lk" data-act="amode" data-m="forgot">Esqueceu a senha?</button></div>':''}
+  <div class="err" id="aerr">${esc(msg||'')}</div>
+  <button class="btn red go" style="width:100%">${m=='login'?'Entrar':m=='reg'?'Criar conta':'Redefinir senha'}</button>
+  <p class="mu alt">${m=='login'?'Precisando de uma conta? <button type="button" class="lk" data-act="amode" data-m="reg">Registre-se</button>':'<button type="button" class="lk" data-act="amode" data-m="login">Já tenho uma conta</button>'}</p></form>`;
+  const u=$('a_user');u&&u.focus()}
+const askedP=new Set();
+function needProfs(){const ids=[];srvs.forEach(s=>s.members.forEach(m=>{const c=m.c;if(c!=me.code&&!friends.find(f=>f.code==c)&&!pcache[c]&&!askedP.has(c)){askedP.add(c);ids.push(c)}}));if(ids.length)wsend({t:'profGet',ids:ids.slice(0,50)})}
+const sendReq=code=>wsend({t:'reqSend',to:code});
+function onMsg(d){switch(d.t){
+  case 'auth':tok=d.token;try{localStorage.setItem('d2tok',JSON.stringify(tok))}catch(x){}if(d.rec)pendingRec={code:d.rec,reset:!!d.reset};break;
+  case 'autherr':if(d.resume){tok='';try{localStorage.removeItem('d2tok')}catch(x){}showAuth('')}else{const e=$('aerr');e?e.textContent=d.m:showAuth(d.m)}break;
+  case 'init':{me=d.me;ICE=d.ice||ICE;friends=d.friends;online={};friends.forEach(f=>online[f.code]=f.on?1:0);
+    reqs=[...d.reqIn.map(u=>({...u,dir:'in'})),...d.reqOut.map(u=>({...u,dir:'out'}))];srvs=d.servers;active={};for(const k in d.voice)active[k]=new Set(d.voice[k]);
+    $('auth').hidden=true;setConn(true);booted=true;
+    if(inCall){Object.keys(pcs).forEach(closePc);wsend({t:'vj',c:inCall.id})}
+    fixCur();renderAll();needProfs();if(cur)wsend({t:'hist',c:cur.id});checkVer(d.ver);if(pendingRec){showRec(pendingRec.code,pendingRec.reset);pendingRec=null}break}
+  case 'me':me=d.me;renderAll();if(!$('set').hidden)renderSettings();break;
+  case 'friend':{const f=d.f,i=friends.findIndex(x=>x.code==f.code);i<0?friends.push(f):friends[i]=f;online[f.code]=f.on?1:0;reqs=reqs.filter(r=>r.code!=f.code);renderSres();sched();break}
+  case 'frDel':friends=friends.filter(f=>f.code!=d.code);delete online[d.code];fixDm();renderSres();sched();break;
+  case 'pres':{const f=friends.find(x=>x.code==d.code);if(f){f.status=d.status;online[d.code]=d.on?1:0}sched();break}
+  case 'reqIn':if(!reqs.find(r=>r.code==d.u.code&&r.dir=='in'))reqs.push({...d.u,dir:'in'});st(d.u.name+' enviou um pedido de amizade.');sched();break;
+  case 'reqOut':reqs.push({...d.u,dir:'out'});st('Pedido enviado para '+d.u.name+'.');renderSres();sched();break;
+  case 'reqRm':reqs=reqs.filter(r=>r.code!=d.code);renderSres();sched();break;
+  case 'results':sres=d;renderSres();break;
+  case 'profs':d.list.forEach(p=>pcache[p.code]=p);sched();if(cur)renderMsgs();break;
+  case 'msg':pushMsg(d.c,d.m);break;
+  case 'hist':hist[d.c]=d.msgs;if(cur&&cur.id==d.c)renderMsgs();break;
+  case 'srv':{const n=d.srv,i=srvs.findIndex(s=>s.id==n.id);let s;
+    if(i>=0){if(!('icon' in n))n.icon=srvs[i].icon;s=Object.assign(srvs[i],n)}else{s=n;srvs.push(n);st('Você entrou no servidor '+n.name+'.')}
+    needProfs();if(d.open){cs=s.id;open_(srvCh(s,s.chans[0]))}else{fixCur();sched()}if(srvModal&&srvModal.id==s.id)srvModal.rs();break}
+  case 'sDel':{const s=srvById(d.id);srvs=srvs.filter(x=>x.id!=d.id);if(inCall&&inCall.sid==d.id)leaveCall();if(s)st('Você não está mais em '+s.name+'.');
+    if(srvModal&&srvModal.id==d.id){$('modal').classList.remove('on');srvModal=null}fixCur();sched();break}
+  case 'vs':{const k=String(d.c),old=active[k]||new Set(),nw=new Set(d.on);active[k]=nw;
+    if(inCall&&inCall.id==k){nw.forEach(p=>{if(p==me.code)return;if(!old.has(p)&&old.size)beep(660);if(me.code<p)callPeer(p)});
+      old.forEach(p=>{if(!nw.has(p)){beep(440);dropVoice(p);closePc('screen:'+p);delete muted[p]}})}
+    sched();break}
+  case 'mu':muted[d.from]=!!d.on;renderCall();break;
+  case 'ring':{if(!friends.find(x=>x.code==d.from))break;if(ringIn||ringOut){wsend({t:'rr',to:d.from});break}
+    ringIn={code:d.from,ch:dm(d.from),t:setTimeout(()=>{if(ringIn&&ringIn.code==d.from){st('Chamada perdida de '+nameOf(d.from));ringIn=null;endRing()}},35000)};showRing();ringStart();break}
+  case 'ra':{if(ringOut&&ringOut.code==d.from){const ch=ringOut.ch;clearTimeout(ringOut.t);ringOut=null;endRing();joinCall(ch)}break}
+  case 'rr':{if(ringOut&&ringOut.code==d.from){clearTimeout(ringOut.t);ringOut=null;endRing();st(nameOf(d.from)+' recusou a chamada.')}break}
+  case 'rx':{if(ringIn&&ringIn.code==d.from){clearTimeout(ringIn.t);ringIn=null;endRing();st('Chamada perdida de '+nameOf(d.from))}break}
+  case 'sig':onSig(d.from,d.k,d.d||{});break;
+  case 'ok':st(d.m);break;
+  case 'rec':showRec(d.rec,0);break;
+  case 'err':st(d.m);break}}
+function fixDm(){if(cur&&cur.k=='dm'&&!friends.find(f=>cur.id==dm(f.code).id))cur=null}
+
+/* ---------- renderização ---------- */
+function renderAll(){fixCur();renderRail();renderSide();renderMe();renderMain();updateUI()}
+function renderMe(){$('uav').innerHTML=`<span class="avw">${av(me.code,34,me.name,1)}<i class="dot ${myStat()}" style="border-color:var(--bg2)"></i></span>`;$('myname').textContent=me.name;$('mytag').textContent='#'+me.tag}
+function renderRail(){$('rail').innerHTML=`<div class="rw ${!cs?'on':''}"><button class="ri" data-act="home" title="Início">E</button></div><div class="rs"></div>`+
+  srvs.map(s=>{const live=s.chans.some(c=>c.t=='v'&&active[s.id+':'+c.id]&&active[s.id+':'+c.id].size);
+    return `<div class="rw ${cs==s.id?'on':''}"><button class="ri" data-act="srv" data-s="${esc(s.id)}" title="${esc(s.name)}">${s.icon?`<img src="${burl(s.icon)}" alt="">`:esc(s.name.slice(0,2).toUpperCase())}${live?'<i class="bd"></i>':''}</button></div>`}).join('')+
+  `<div class="rw"><button class="ri" data-act="addsrv" title="Criar servidor">${ic('plus')}</button></div>`}
+function renderSide(){const s=cs&&srvById(cs);$('sf').hidden=!!s;$('svh').hidden=!s;let h='';
+  if(s){$('svh').innerHTML=`<span>${esc(s.name)}</span>${ic('chev')}`;const mg=canManage(s);
+    const sect=(t,l)=>`<div class="lb tag"><span>${l}</span>${mg?`<button class="ib" style="width:22px;height:22px" data-act="newch" data-t="${t}" title="Criar canal">${ic('plus')}</button>`:''}</div>`;
+    h=sect('t','Canais de texto')+s.chans.filter(c=>c.t=='t').map(c=>`<button class="it ${cur&&cur.id==s.id+':'+c.id?'sel':''}" data-act="ch" data-s="${esc(s.id)}" data-c="${esc(c.id)}"><span class="hi">${ic('hash')}</span><span class="nm">${esc(c.n)}</span></button>`).join('')+
+      sect('v','Canais de voz')+s.chans.filter(c=>c.t=='v').map(c=>{const k=s.id+':'+c.id;return `<button class="it ${inCall&&inCall.id==k?'sel':''}" data-act="vch" data-s="${esc(s.id)}" data-c="${esc(c.id)}"><span class="hi">${ic('vol')}</span><span class="nm">${esc(c.n)}</span></button>`+[...(active[k]||[])].map(x=>`<div class="vp">${av(x,22,nameOf(x),1)}<span>${esc(nameOf(x))}</span></div>`).join('')}).join('')}
+  else{const raw=$('q').value.trim(),q=raw.toLowerCase(),pend=reqs.filter(r=>r.dir=='in').length;
+    const list=friends.filter(f=>!q||(f.name||'').toLowerCase().includes(q)),extra=[];
+    if(q){const seen=new Set(friends.map(f=>f.code).concat(me.code));srvs.forEach(sv=>Object.entries(sv.names||{}).forEach(([c,n])=>{if(!seen.has(c)&&String(n).toLowerCase().includes(q)){seen.add(c);extra.push({code:c,name:n})}}))}
+    h=`<button class="it ${!cur?'sel':''}" data-act="home"><span class="hi">${ic('user')}</span><span class="nm">Amigos</span>${pend?`<i class="nb">${pend}</i>`:''}</button><div class="lb tag"><span>Mensagens diretas</span><span>${String(friends.length).padStart(2,'0')}</span></div>`+
+    list.map(f=>{const live=active[dm(f.code).id]&&active[dm(f.code).id].size;return `<button class="it ${cur&&cur.id==dm(f.code).id?'sel':''}" data-act="dm" data-d="${esc(f.code)}"><span class="avw">${av(f.code,30,f.name,1)}<i class="dot ${stat(f.code)}"></i></span><span class="nm">${esc(f.name)}</span>${live?'<span class="pl">AO VIVO</span>':''}</button>`}).join('')+
+    (extra.length?`<div class="lb tag"><span>Pessoas dos seus servidores</span></div>`+extra.map(f=>`<button class="it" data-act="req" data-c="${esc(f.code)}"><span class="nm">${esc(f.name)}</span><span class="pl">+ Pedir</span></button>`).join(''):'')+
+    (q&&!list.length&&!extra.length?`<div class="it mu">Enter para enviar pedido ao código “${esc(raw)}”</div>`:'')}
+  $('sl').innerHTML=h}
+function renderMain(){const c=!!cur;$('home').hidden=c;$('chatcol').hidden=!c;
+  if(c){$('title').textContent=(cur.k=='dm'?'@ ':'# ')+cur.name;const s=cur.sid&&srvById(cur.sid);$('tdesc').textContent=s?(s.desc||s.name):'Conversa direta'}else renderHome()}
+function renderHome(){const pend=reqs.filter(r=>r.dir=='in').length;
+  $('tabs').innerHTML=[['on','Disponível'],['all','Todos'],['pend','Pendentes'+(pend?`<i class="nb">${pend}</i>`:'')]].map(([k,l])=>`<button class="tb ${tab==k?'on':''}" data-act="tab" data-k="${k}">${l}</button>`).join('')+`<button class="btn red sm" data-act="tab" data-k="add">Adicionar amigo</button>`;
+  $('hq').hidden=tab=='add'||tab=='pend';renderActive();
+  if(tab=='add'&&$('ac')&&$('hb').dataset.t=='add')return;
+  const q=$('hq').value.trim().toLowerCase();let h='';
+  if(tab=='add')h=`<div class="tag mu">02 — Novo pedido</div><p class="mu" style="max-width:56ch">Busque pelo nome de usuário ou pelo nome. Só aparecem pessoas que têm conta no ECHOO, e a outra pessoa precisa aceitar o pedido.</p><form id="af" class="afr"><input id="ac" placeholder="Nome de usuário ou nome" autocomplete="off" aria-label="Buscar pessoas"><button class="btn red">Buscar</button></form><div id="sres"></div><div class="tag mu" style="margin-top:20px">Seu usuário</div><div><button class="btn sm" data-act="code" title="Copiar">@${esc(me.user)}</button></div>`;
+  else if(tab=='pend'){const i=reqs.filter(r=>r.dir=='in'),o=reqs.filter(r=>r.dir=='out');
+    h=`<div class="tag mu">Recebidos — ${String(i.length).padStart(2,'0')}</div>`+(i.length?i.map(r=>`<div class="fr rv"><span class="avw">${av(r.code,40,r.name,1)}</span><div class="un"><b>${esc(r.name||r.code)}</b><small>Quer ser seu amigo</small></div><button class="ib rnd ok" data-act="acc" data-c="${esc(r.code)}" title="Aceitar">${ic('check')}</button><button class="ib rnd no" data-act="dec" data-c="${esc(r.code)}" title="Recusar">${ic('close')}</button></div>`).join(''):'<p class="mu">Nenhum pedido recebido.</p>')+
+    `<div class="tag mu" style="margin-top:18px">Enviados — ${String(o.length).padStart(2,'0')}</div>`+(o.length?o.map(r=>`<div class="fr rv"><span class="avw">${av(r.code,40,r.name,1)}</span><div class="un"><b>${esc(r.name||r.code)}</b><small>Aguardando resposta</small></div><button class="ib rnd no" data-act="cnl" data-c="${esc(r.code)}" title="Cancelar">${ic('close')}</button></div>`).join(''):'<p class="mu">Nenhum pedido enviado.</p>')}
+  else{const l=friends.filter(f=>(tab=='all'||stat(f.code)!='offline')&&(!q||(f.name||'').toLowerCase().includes(q)));
+    h=`<div class="tag mu">${tab=='all'?'Todos os amigos':'Online'} — ${String(l.length).padStart(2,'0')}</div>`+(l.length?l.map((f,i)=>`<div class="fr"><span class="n tag">${String(i+1).padStart(2,'0')}</span><span class="avw">${av(f.code,40,f.name,1)}<i class="dot ${stat(f.code)}" style="border-color:var(--bg)"></i></span><div class="un"><b>${esc(f.name)}</b><small>${SN[stat(f.code)]}</small></div><button class="ib rnd" data-act="dm" data-d="${esc(f.code)}" title="Mensagem">${ic('chat')}</button><button class="ib rnd" data-act="unf" data-c="${esc(f.code)}" title="Remover amigo">${ic('trash')}</button></div>`).join(''):`<p class="mu" style="max-width:52ch">${friends.length?'Ninguém online agora.':'Você ainda não tem amigos. Use “Adicionar amigo” e envie um pedido com o código de quem quer conversar.'}</p>`)}
+  $('hb').innerHTML=h;$('hb').dataset.t=tab;renderSres()}
+function renderSres(){const el=$('sres');if(!el)return;if(!sres){el.innerHTML='';return}
+  el.innerHTML=`<div class="tag mu" style="margin-top:18px">Resultados para “${esc(sres.q)}” — ${String(sres.users.length).padStart(2,'0')}</div>`+(sres.users.length?sres.users.map(u=>{const rel=friends.find(f=>f.code==u.code)?'f':reqs.find(r=>r.code==u.code&&r.dir=='out')?'o':reqs.find(r=>r.code==u.code&&r.dir=='in')?'i':'';
+    return `<div class="fr"><span class="avw">${av(u.code,40,u.name,1)}</span><div class="un"><b>${esc(u.name)} <small>#${esc(u.tag)}</small></b><small>@${esc(u.user)}</small></div>${rel=='f'?'<small>Já são amigos</small>':rel=='o'?'<small>Pedido enviado</small>':rel=='i'?`<button class="btn sm red" data-act="acc" data-c="${esc(u.code)}">Aceitar</button>`:`<button class="btn sm red" data-act="req" data-c="${esc(u.code)}">Pedir amizade</button>`}</div>`}).join(''):'<p class="mu">Ninguém encontrado. Confira o nome de usuário.</p>')}
+function renderActive(){const it=[];for(const k in active){const s=active[k];if(!s.size)continue;const o=chByKey(k);if(o)it.push({k,o,m:[...s]})}
+  $('act').innerHTML=`<span class="tag mu">03 — Agora</span><h2 class="disp">Ativo agora</h2>`+(it.length?it.map(i=>`<div class="ac"><div class="acs">${i.m.slice(0,3).map(c=>av(c,28,nameOf(c),1)).join('')}</div><div class="un"><b>${esc(i.o.label)}</b><small>${i.m.length} na call</small></div><button class="btn red sm" data-act="joink" data-k="${esc(i.k)}">Entrar</button></div>`).join(''):'<p class="mu">Quando seus amigos estiverem em uma call, ela aparece aqui.</p>')}
+function open_(ch){cur=ch;cs=ch.k=='dm'?null:ch.sid;if(ch.sid)lastCh[ch.sid]=ch.id;renderAll();renderMsgs();wsend({t:'hist',c:ch.id})}
+function msgHTML(m,p){const c=p&&p.k==m.k&&m.ts-p.ts<3e5,s=cur&&cur.sid&&srvById(cur.sid),col=s?roleColor(s,m.k):'';
+  const t=new Date(m.ts).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  return `<div class="m ${c?'c':''}">${c?'<div class="sp0"></div>':av(m.k||'?',36,m.u)}<div><div class="mh" ${c?'hidden':''}><b${col?` style="color:${col}"`:''}>${esc(m.u)}</b><small>${t}</small></div><div class="tx">${esc(m.m)}</div></div></div>`}
+function renderMsgs(){if(!cur)return;const a=(hist[cur.id]||[]).slice(-200);let p=null;const s=cur.sid&&srvById(cur.sid);
+  const wl=a.length?'':`<div class="wl"><span class="tag mu">${cur.k=='dm'?'Conversa direta':'Canal de texto'}</span><h2 class="disp">${cur.k=='dm'?esc(cur.name):'# '+esc(cur.name)}</h2><p>${cur.k=='dm'?'Este é o começo da sua conversa com '+esc(cur.name)+'.':esc((s&&s.desc)||'Este é o começo do canal.')}</p></div>`;
+  $('msgs').innerHTML=wl+a.map(m=>{const h=msgHTML(m,p);p=m;return h}).join('');$('msgs').scrollTop=1e9}
+function pushMsg(key,m){const h=hist[key]=hist[key]||[];const prev=h[h.length-1];h.push(m);if(h.length>500)h.splice(0,h.length-500);save();
+  if(cur&&cur.id==key){const b=$('msgs'),w=b.querySelector('.wl');w&&w.remove();b.insertAdjacentHTML('beforeend',msgHTML(m,prev));while(b.children.length>200)b.firstChild.remove();b.scrollTop=1e9}}
+function renderCall(){if(!inCall)return;const s=[...(active[inCall.id]||[])];
+  $('tiles').innerHTML=s.map(c=>`<div class="tile" id="t-${esc(c)}">${av(c,0,nameOf(c))}<span>${esc(nameOf(c))}</span>${muted[c]?`<i class="mm">${ic('mic',1)}</i>`:''}</div>`).join('')}
+function setIcons(){const set=(a,n,off,t)=>document.querySelectorAll(`[data-act=${a}]`).forEach(b=>{b.innerHTML=ic(n,off);b.classList.toggle('off',!!off);b.title=t});
+  set('mic','mic',micOff,micOff?'Ativar microfone':'Silenciar microfone');set('deaf','head',deaf,deaf?'Ativar áudio':'Ensurdecer (silenciar tudo)');
+  set('leave','hang',0,'Desconectar');set('set','gear',0,'Configurações');set('fs','full',0,'Tela cheia');set('call','phone',0,'Ligar');
+  $('scr').innerHTML=ic('scr');$('scr').classList.toggle('live',!!screenStream);$('scr').title=screenStream?'Parar transmissão':'Compartilhar tela';
+  document.querySelectorAll('.cb[data-act=mic],.cb[data-act=deaf]').forEach(b=>{b.classList.toggle('off',b.dataset.act=='mic'?micOff:deaf)})}
+function updateUI(){const dmc=cur&&cur.k=='dm';$('callb').hidden=!(dmc&&!inCall&&!ringOut);
+  document.body.classList.toggle('incall',!!inCall);$('callcol').hidden=$('vc').hidden=!inCall;
+  if(inCall){$('cn').textContent=(inCall.sname?inCall.sname+' / ':'')+inCall.name;$('ctn').textContent=(inCall.k=='dm'?'@ ':'')+inCall.name}
+  $('mystat').textContent=SN[myStat()];setIcons();renderCall()}
+
+/* ---------- sons e ligação com aceite ---------- */
+function beep(f,d){try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=.05;o.connect(g).connect(AC.destination);o.start();o.stop(AC.currentTime+(d||.12))}catch(e){}}
+function ringStart(){ringStop();if(me.status=='dnd')return;const p=()=>{beep(520,.18);setTimeout(()=>beep(660,.18),240)};p();rt=setInterval(p,1700)}
+function ringStop(){clearInterval(rt);rt=null}
+function showRing(){const r=$('ring'),x=ringIn||ringOut;if(!x){r.hidden=true;return}r.hidden=false;
+  r.innerHTML=`<span class="tag">${ringIn?'Chamada recebida':'Chamando…'}</span><div class="rr">${av(x.code,56,nameOf(x.code),1)}<b class="disp">${esc(nameOf(x.code))}</b></div><div class="rb">${ringIn?'<button class="btn" data-act="ra">Atender</button><button class="btn" data-act="rd">Recusar</button>':'<button class="btn" data-act="rc">Cancelar</button>'}</div>`}
+function endRing(){ringStop();showRing();updateUI()}
+function startRing(ch){if(inCall||ringOut||ringIn)return st('Você já está em uma ligação.');const code=ch.members.find(c=>c!=me.code);
+  if(!online[code])return st(nameOf(code)+' está offline.');
+  ringOut={code,ch,t:setTimeout(()=>{if(ringOut){wsend({t:'rx',to:code});ringOut=null;endRing();st('Sem resposta de '+nameOf(code)+'.')}},35000)};
+  wsend({t:'ring',to:code});showRing();ringStart();updateUI()}
+function acceptRing(){if(!ringIn)return;const x=ringIn;clearTimeout(x.t);ringIn=null;endRing();wsend({t:'ra',to:x.code});joinCall(x.ch)}
+function declineRing(){if(!ringIn)return;const x=ringIn;clearTimeout(x.t);ringIn=null;endRing();wsend({t:'rr',to:x.code})}
+function cancelRing(){if(!ringOut)return;const x=ringOut;clearTimeout(x.t);ringOut=null;endRing();wsend({t:'rx',to:x.code})}
+
+/* ---------- call de voz ---------- */
+function watch(code,s){try{AC=AC||new AudioContext();AC.resume();const a=AC.createAnalyser();a.fftSize=512;AC.createMediaStreamSource(s).connect(a);an[code]=a}catch(e){}}
+const buf=new Uint8Array(256);
+function speakTick(){if(document.hidden)return;for(const c in an){an[c].getByteTimeDomainData(buf);let m=0;for(let i=0;i<256;i++){const v=Math.abs(buf[i]-128);if(v>m)m=v}const el=$('t-'+c);if(el)el.classList.toggle('speaking',m>14)}}
+const others=ch=>ch.members.filter(c=>c!=me.code);
+function applyMic(){const t=mic&&mic.getAudioTracks()[0];if(t)t.enabled=!micOff;if(inCall){muted[me.code]=micOff;wsend({t:'mu',on:micOff})}updateUI()}
+function applyDeaf(){document.querySelectorAll('#audios audio').forEach(a=>a.muted=deaf);if(!screenStream)$('vid').muted=deaf}
+function toggleMic(){micOff=!micOff;if(!micOff&&deaf){deaf=false;applyDeaf()}applyMic()}
+function toggleDeaf(){deaf=!deaf;if(deaf){preMic=micOff;micOff=true}else micOff=preMic;applyDeaf();applyMic()}
+// quem tem o código menor inicia a conexão: evita chamadas duplicadas entre os dois lados
+function mkpc(code,k){const pc=new RTCPeerConnection({iceServers:ICE});pc.onicecandidate=e=>{if(e.candidate)wsend({t:'sig',to:code,k,d:{ice:e.candidate}})};return pc}
+function closePc(key){const pc=pcs[key];if(pc){try{pc.close()}catch(e){}delete pcs[key]}delete pendIce[key]}
+function attachAudio(code,s){let a=$('au'+code);if(!a){a=document.createElement('audio');a.id='au'+code;a.autoplay=true;$('audios').append(a)}a.srcObject=s;a.muted=deaf;watch(code,s)}
+function dropVoice(code){closePc('voice:'+code);const a=$('au'+code);a&&a.remove();delete an[code]}
+async function flushIce(pc,key){const q=pendIce[key]||[];delete pendIce[key];for(const c of q){try{await pc.addIceCandidate(c)}catch(e){}}}
+// quem tem o código menor inicia a conexão: evita chamadas duplicadas entre os dois lados
+async function callPeer(c){if(!inCall||!mic||pcs['voice:'+c])return;const key='voice:'+c,pc=pcs[key]=mkpc(c,'voice');
+  mic.getTracks().forEach(t=>pc.addTrack(t,mic));pc.ontrack=e=>attachAudio(c,e.streams[0]);
+  pc.onconnectionstatechange=()=>{if(pc.connectionState=='failed')dropVoice(c)};
+  await pc.setLocalDescription(await pc.createOffer());wsend({t:'sig',to:c,k:'voice',d:{sdp:pc.localDescription}})}
+async function onSig(from,k,d){const key=k+':'+from;let pc=pcs[key];
+  if(d.stop){if(k=='screen'){closePc(key);hideStream()}return}
+  if(d.sdp&&d.sdp.type=='offer'){if(!inCall)return;closePc(key);pc=pcs[key]=mkpc(from,k);
+    if(k=='voice'){mic&&mic.getTracks().forEach(t=>pc.addTrack(t,mic));pc.ontrack=e=>attachAudio(from,e.streams[0]);pc.onconnectionstatechange=()=>{if(pc.connectionState=='failed')dropVoice(from)}}
+    else pc.ontrack=e=>showStream(e.streams[0],false,nameOf(from)+' está transmitindo');
+    await pc.setRemoteDescription(d.sdp);await flushIce(pc,key);await pc.setLocalDescription(await pc.createAnswer());wsend({t:'sig',to:from,k,d:{sdp:pc.localDescription}});
+    if(k=='voice'&&screenStream)shareTo(from)}
+  else if(d.sdp&&d.sdp.type=='answer'&&pc){await pc.setRemoteDescription(d.sdp);await flushIce(pc,key)}
+  else if(d.ice){if(pc&&pc.remoteDescription){try{await pc.addIceCandidate(d.ice)}catch(e){}}else(pendIce[key]=pendIce[key]||[]).push(d.ice)}}
+async function joinCall(ch){ch=ch||cur;if(!ch)return;if(inCall){if(inCall.id==ch.id)return;leaveCall()}
+  const a={echoCancellation:true,noiseSuppression:!!cfg.ns,autoGainControl:true};
+  try{mic=await navigator.mediaDevices.getUserMedia({audio:cfg.mic?{...a,deviceId:{exact:cfg.mic}}:a})}catch(e){try{mic=await navigator.mediaDevices.getUserMedia({audio:a})}catch(e2){return st('Sem acesso ao microfone.')}}
+  inCall=ch;AC=AC||new AudioContext();AC.resume();watch(me.code,mic);wsend({t:'vj',c:ch.id});beep(660);applyMic();spk=setInterval(speakTick,150);updateUI()}
+function leaveCall(){if(!inCall)return;clearInterval(spk);stopShare();Object.keys(pcs).forEach(closePc);document.querySelectorAll('#audios audio').forEach(a=>a.remove());an={};mic&&mic.getTracks().forEach(t=>t.stop());mic=null;
+  wsend({t:'vl'});beep(440);inCall=null;muted={};hideStream();sched();updateUI()}
+
+/* ---------- compartilhamento de tela ---------- */
+const qopts=[['720','720p • 30 fps (leve)'],['1080','1080p • 30 fps (recomendado)'],['1080p60','1080p • 60 fps'],['1440','1440p • 60 fps (pesado)']];
+function showStream(s,mine,label){$('callcol').classList.add('live');$('mine').hidden=!mine;$('vid').hidden=mine;$('fsb').hidden=mine;
+  if(mine){$('vid').srcObject=null;$('mineq').textContent=label}else{$('vid').srcObject=s;$('vid').muted=deaf;$('vlabel').textContent=label}}
+function hideStream(){$('vid').srcObject=null;$('mine').hidden=true;$('callcol').classList.remove('live');if(document.fullscreenElement)document.exitFullscreen().catch(()=>{})}
+function fsToggle(){try{if(document.fullscreenElement)document.exitFullscreen().catch(()=>{});else if($('stage').requestFullscreen)$('stage').requestFullscreen().catch(()=>st('Não foi possível abrir em tela cheia.'))}catch(e){}}
+$('vid').ondblclick=fsToggle;
+async function capture(id,q){const[w,h,fps]=Q[q];
+  if(window.api&&id){const v={mandatory:{chromeMediaSource:'desktop',chromeMediaSourceId:id,maxWidth:w,maxHeight:h,maxFrameRate:fps,minFrameRate:Math.min(15,fps)}};
+    if(id.startsWith('screen')){try{return await navigator.mediaDevices.getUserMedia({audio:{mandatory:{chromeMediaSource:'desktop'}},video:v})}catch(e){}}
+    return navigator.mediaDevices.getUserMedia({audio:false,video:v})}
+  return navigator.mediaDevices.getDisplayMedia({video:{width:{ideal:w},height:{ideal:h},frameRate:{ideal:fps}},audio:true})}
+async function pick(){let srcs=[];try{if(window.api)srcs=await api.sources()}catch(e){}
+  const grid=srcs.length?'<div class="grid">'+srcs.map((s,i)=>`<label class="src"><input type="radio" name="s" value="${esc(s.id)}" ${i?'':'checked'}><img src="${s.thumb}" alt=""><span>${esc(s.name)}</span></label>`).join('')+'</div>':'<small>O navegador vai perguntar o que compartilhar.</small>';
+  modal(`<h3 class="disp">O que compartilhar?</h3>${grid}<label class="fl"><span class="tag">Qualidade</span><select name="q">${qopts.map(([k,l])=>`<option value="${k}" ${cfg.q==k?'selected':''}>${l}</option>`).join('')}</select></label><label class="fl"><span class="tag">Foco</span><select name="f"><option value="detail">Nitidez (texto, programas)</option><option value="motion">Fluidez (jogos, vídeos)</option></select></label>`,fd=>startShare(fd.get('s'),fd.get('q'),fd.get('f')),'Transmitir')}
+async function startShare(id,q,fo){try{screenStream=await capture(id,q)}catch(e){screenStream=null;return st('Não foi possível compartilhar a tela.')}
+  shareQ=q;const vt=screenStream.getVideoTracks()[0];vt.contentHint=fo||'detail';vt.onended=()=>stopShare();
+  showStream(null,true,(qopts.find(x=>x[0]==q)||['',''])[1].replace(/ \(.*\)/,''));Object.keys(pcs).filter(k=>k.startsWith('voice:')).forEach(k=>shareTo(k.slice(6)));updateUI()}
+function pref(c){try{c.getTransceivers().forEach(t=>{if(t.sender&&t.sender.track&&t.sender.track.kind=='video'&&t.setCodecPreferences){
+  const cs=RTCRtpSender.getCapabilities('video').codecs,h=cs.filter(x=>/h264/i.test(x.mimeType)),o=cs.filter(x=>!/h264/i.test(x.mimeType));if(h.length)t.setCodecPreferences([...h,...o])}})}catch(e){}}
+async function shareTo(code){const key='screen:'+code;closePc(key);const pc=pcs[key]=mkpc(code,'screen');
+  screenStream.getTracks().forEach(t=>pc.addTrack(t,screenStream));pref(pc);
+  await pc.setLocalDescription(await pc.createOffer());wsend({t:'sig',to:code,k:'screen',d:{sdp:pc.localDescription}});
+  const tune=()=>{try{pc.getSenders().forEach(s=>{if(s.track&&s.track.kind=='video'){const p=s.getParameters();if(!p.encodings||!p.encodings.length)p.encodings=[{}];p.encodings[0].maxBitrate=Q[shareQ][3];p.encodings[0].maxFramerate=Q[shareQ][2];s.setParameters(p)}})}catch(e){}};
+  pc.onconnectionstatechange=()=>{if(pc.connectionState=='connected')tune()};setTimeout(tune,1500)}
+function stopShare(){if(!screenStream)return;screenStream.getTracks().forEach(t=>t.stop());screenStream=null;Object.keys(pcs).filter(k=>k.startsWith('screen:')).forEach(k=>{wsend({t:'sig',to:k.slice(7),k:'screen',d:{stop:1}});closePc(k)});hideStream();updateUI()}
+
+/* ---------- popovers e modais ---------- */
+function openPop(html,cls){const p=$('pop');p.className=cls||'';p.innerHTML=html;p.hidden=false}
+function userPop(){const sts=[['online','Disponível'],['idle','Ausente'],['dnd','Não perturbe'],['invisible','Invisível']];
+  openPop(`<div class="bn" style="${bnStyle(me.banner,me.code)}"></div><div class="pc">${av(me.code,64,me.name,1)}<i class="dot ${myStat()}"></i></div><div class="pb"><b class="disp">${esc(me.name)}</b><br><small>@${esc(me.user)} · #${esc(me.tag)}</small></div>
+  <div class="pl2"><button data-act="prof">${ic('user')} Editar perfil</button><button data-act="set">${ic('gear')} Configurações</button><button data-act="code">Copiar meu código</button></div>
+  <div class="pl2">${sts.map(([k,l])=>`<button data-act="status" data-k="${k}"><i class="dot ${k=='invisible'?'offline':k}" style="position:static;border-color:var(--bg);flex:none"></i> ${l}${me.status==k?' ✓':''}</button>`).join('')}</div>`)}
+function srvMenu(){const s=srvById(cs);if(!s)return;const mg=canManage(s);
+  openPop((mg?`<button data-act="invite">Convidar amigos</button><button data-act="ssett">Configurações do servidor</button><button data-act="newch" data-t="t">Criar canal</button>`:'')+(s.owner==me.code?`<button class="rd" data-act="delsrv">Excluir servidor</button>`:`<button class="rd" data-act="leavesrv">Sair do servidor</button>`),'sv')}
+function showProfile(c){const p=prof(c),n=p.name||nameOf(c),mine=c==me.code,fr=friends.find(f=>f.code==c);
+  modal(`<div class="bn" style="${bnStyle(p.banner,c)}"></div><div class="pc2">${av(c,76,n,1)}<div><b class="disp" style="font-size:30px">${esc(n)}</b> <small>#${esc(p.tag||'0000')}</small></div></div><small>@${esc(p.user||'')}</small>`,()=>mine?openSettings('perfil'):(fr?open_(dm(c)):0),mine?'Editar perfil':(fr?'Mandar mensagem':'OK'))}
+function newServer(){let icn='';modal(`<h3 class="disp">Criar servidor</h3><div class="upl"><label class="upi" id="upv">${ic('cam')}<input type="file" id="fi" accept="image/*" hidden></label><small>Escolha uma foto para o servidor</small></div><label class="fl"><span class="tag">Nome</span><input name="n" maxlength="32" required></label><label class="fl"><span class="tag">Descrição</span><input name="d" maxlength="160"></label>`,fd=>{
+    const n=fd.get('n').trim();if(!n)return;wsend({t:'sNew',name:n,desc:fd.get('d').trim(),icon:icn})},'Criar');
+  $('fi').onchange=async e=>{const f=e.target.files[0];if(!f)return;icn=await imgJpeg(f,128,128,.85);const u=$('upv');u.style.backgroundImage=`url('${burl(icn)}')`;u.classList.add('has')}}
+function newCh(s,t){modal(`<h3 class="disp">Criar canal</h3><div class="row2"><label class="ck"><input type="radio" name="t" value="t" ${t!='v'?'checked':''}> Texto</label><label class="ck"><input type="radio" name="t" value="v" ${t=='v'?'checked':''}> Voz</label></div><label class="fl"><span class="tag">Nome do canal</span><input name="n" maxlength="24" required></label>`,fd=>{
+  const n=fd.get('n').trim();if(!n)return;wsend({t:'sChanAdd',id:s.id,n,ch:fd.get('t')=='v'?'v':'t'})},'Criar')}
+function inviteM(s){const l=friends.filter(f=>!mem(s,f.code));if(!l.length)return st('Todos os seus amigos já estão no servidor.');
+  modal(`<h3 class="disp">Convidar amigos</h3>`+l.map(f=>`<label class="ck"><input type="checkbox" name="m" value="${esc(f.code)}">${esc(f.name)}</label>`).join(''),fd=>{const sel=fd.getAll('m');if(!sel.length)return;wsend({t:'sInv',id:s.id,ids:sel});st('Convites enviados.')},'Convidar')}
+function leaveSrv(s){confirmM('Sair de '+s.name+'?',()=>{if(inCall&&inCall.sid==s.id)leaveCall();wsend({t:'sLeave',id:s.id})},'Sair')}
+function delSrv(s){confirmM('Excluir '+s.name+' para todos?',()=>{if(inCall&&inCall.sid==s.id)leaveCall();wsend({t:'sDel',id:s.id})},'Excluir')}
+function srvSettings(s){let pi=null,nm=s.name,ds=s.desc;const m=$('modal');
+  const rs=()=>{const ico=pi||s.icon;
+    const roles=s.roles.map((r,i)=>`<div class="sr"><i class="cd" style="background:${r.color}"></i><span class="nm">${esc(r.name)}${r.manage?' <small>· gerencia</small>':''}</span>${i?`<button class="ib" data-sa="delrole" data-r="${esc(r.id)}" title="Excluir cargo">${ic('trash')}</button>`:''}</div>`).join('');
+    const mems=s.members.map(x=>`<div class="sr">${av(x.c,28,nameOf(x.c),1)}<span class="nm">${esc(nameOf(x.c))}${x.c==s.owner?' · dono':''}</span><span class="chips">${s.roles.map(r=>`<button class="ch2 ${x.r.includes(r.id)||(x.c==s.owner&&r.id==s.roles[0].id)?'on':''}" style="--c:${r.color}" data-sa="togrole" data-m="${esc(x.c)}" data-r="${esc(r.id)}">${esc(r.name)}</button>`).join('')}</span>${x.c!=s.owner&&x.c!=me.code?`<button class="ib" data-sa="kick" data-m="${esc(x.c)}" title="Remover do servidor">${ic('close')}</button>`:''}</div>`).join('');
+    const chs=s.chans.map(c=>`<div class="sr"><span class="hi">${ic(c.t=='v'?'vol':'hash')}</span><span class="nm">${esc(c.n)}</span><button class="ib" data-sa="delch" data-c="${esc(c.id)}" title="Excluir canal">${ic('trash')}</button></div>`).join('');
+    m.innerHTML=`<div id="mf" class="wide"><h3 class="disp">Configurações do servidor</h3>
+    <div class="sec"><span class="tag">Visão geral</span><div class="upl"><label class="upi ${ico?'has':''}" id="upv" style="${ico?`background-image:url('${burl(ico)}')`:''}">${ic('cam')}<input type="file" id="fi" accept="image/*" hidden></label><div style="flex:1;display:grid;gap:8px"><input id="sn1" value="${esc(nm)}" maxlength="32" aria-label="Nome"><input id="sd1" value="${esc(ds)}" maxlength="160" placeholder="Descrição" aria-label="Descrição"></div></div><div><button class="btn red sm" data-sa="save">Salvar</button></div></div>
+    <div class="sec"><span class="tag">Cargos</span>${roles}<div class="row2" style="align-items:center"><input id="rn" placeholder="Novo cargo" maxlength="24" style="flex:1;min-width:120px"><input id="rc" type="color" value="#2F6B4F" style="width:48px;padding:2px" aria-label="Cor"><label class="ck"><input type="checkbox" id="rm1"> Pode gerenciar</label><button class="btn sm" data-sa="addrole">Criar</button></div></div>
+    <div class="sec"><span class="tag">Membros</span>${mems}</div><div class="sec"><span class="tag">Canais</span>${chs}</div><div class="row"><button class="btn" data-sa="close">Fechar</button></div></div>`;
+    $('fi').onchange=async e=>{const f=e.target.files[0];if(!f)return;pi=await imgJpeg(f,128,128,.85);rs()}};
+  m.oninput=e=>{if(e.target.id=='sn1')nm=e.target.value;if(e.target.id=='sd1')ds=e.target.value};
+  m.onclick=e=>{const b=e.target.closest('[data-sa]');if(!b)return;const a=b.dataset.sa,d=b.dataset;
+    if(a=='close'){m.classList.remove('on');m.onclick=m.oninput=null;srvModal=null;return}
+    if(!canManage(s))return st('Você não tem permissão para isso.');
+    if(a=='save'){wsend({t:'sEdit',id:s.id,name:nm.trim(),desc:ds.trim(),...(pi?{icon:pi}:{})});pi=null;st('Servidor atualizado.')}
+    else if(a=='addrole'){const n=$('rn').value.trim();if(!n)return st('Dê um nome ao cargo.');wsend({t:'sRoleAdd',id:s.id,name:n,color:$('rc').value,manage:$('rm1').checked})}
+    else if(a=='delrole')wsend({t:'sRoleDel',id:s.id,r:d.r});
+    else if(a=='togrole'){const x=mem(s,d.m);if(!x||d.m==s.owner)return;wsend({t:'sMemRole',id:s.id,m:d.m,r:d.r,on:!x.r.includes(d.r)})}
+    else if(a=='kick')wsend({t:'sKick',id:s.id,m:d.m});
+    else if(a=='delch')wsend({t:'sChanDel',id:s.id,ch:d.c});
+    rs()};
+  srvModal={id:s.id,rs};rs();m.classList.add('on')}
+
+/* ---------- configurações do usuário ---------- */
+const SEC={
+ conta:()=>`<h1 class="disp">Minha conta</h1><div class="sec"><span class="tag">Identidade</span><div class="upl">${av(me.code,64,me.name,1)}<div class="un"><b style="font-size:18px">${esc(me.name)} <small>#${esc(me.tag)}</small></b><small>@${esc(me.user)}</small></div><button class="btn sm" data-act="code">Copiar usuário</button></div></div>
+  <div class="sec"><span class="tag">Status</span><div class="opts">${[['online','Disponível'],['idle','Ausente'],['dnd','Não perturbe'],['invisible','Invisível']].map(([k,l])=>`<button class="opt ${me.status==k?'on':''}" data-act="status" data-k="${k}"><span class="tag">${l}</span></button>`).join('')}</div></div>
+  <div class="sec"><span class="tag">Amigos</span><p class="mu">Sua conta fica guardada no servidor: amigos, servidores e conversas aparecem em qualquer computador onde você entrar. Pedidos de amizade só vão para pessoas que existem e precisam ser aceitos.</p></div>
+  <div class="sec"><span class="tag">Senha</span><label class="fl"><span class="tag mu">Senha atual</span><input id="pw_old" type="password" autocomplete="current-password"></label><label class="fl"><span class="tag mu">Nova senha</span><input id="pw_new" type="password" autocomplete="new-password"></label><div><button class="btn sm" data-act="chpw">Alterar senha</button></div></div>
+  <div class="sec"><span class="tag">Código de recuperação</span><p class="mu">Perdeu o código? Gere um novo (o antigo deixa de valer). Confirme com sua senha.</p><div class="row2"><input id="rc_pw" type="password" placeholder="Sua senha" autocomplete="current-password" style="max-width:240px"><button class="btn sm" data-act="recgen">Gerar novo código</button></div></div>`,
+ perfil:()=>`<h1 class="disp">Perfil</h1><div><div class="bn" id="pbn" style="${bnStyle(pend.b,me.code)}"></div><div class="pc2"><div id="pav">${pend.a?`<img class="av" src="${burl(pend.a)}" alt="">`:av(me.code,76,me.name,1)}</div></div></div>
+  <div class="row2"><label class="btn sm">Banner<input type="file" id="pfb" accept="image/*" hidden></label><label class="btn sm">Ícone<input type="file" id="pfa" accept="image/*" hidden></label></div>
+  <label class="fl"><span class="tag">Nome</span><input id="pn" value="${esc(me.name)}" maxlength="20"></label><label class="fl"><span class="tag">Número (#)</span><input id="pt" value="${esc(me.tag)}" inputmode="numeric" maxlength="4"></label><div><button class="btn red" data-act="psave">Salvar</button></div>`,
+ aparencia:()=>`<h1 class="disp">Aparência</h1><div class="sec"><span class="tag">Tema</span><div class="opts">${[['light','Claro','#EEE6DD','#1E140B'],['dark','Escuro','#17110d','#EEE6DD'],['sys','Sistema','#EEE6DD','#17110d']].map(([k,l,a,b])=>`<button class="opt ${cfg.theme==k?'on':''}" data-act="theme" data-k="${k}"><span class="pv"><i style="background:${a}"></i><i style="background:${b}"></i></span><span class="tag">${l}</span></button>`).join('')}</div></div>
+  <div class="sec"><span class="tag">Paleta de destaque</span><div class="opts">${Object.entries(PAL).map(([k,p])=>`<button class="sw ${cfg.pal==k?'on':''}" style="background:${p[1]}" data-act="pal" data-k="${k}" title="${p[0]}" aria-label="${p[0]}"></button>`).join('')}</div><small>${PAL[cfg.pal][0]}</small></div>
+  <div class="sec"><span class="tag">Movimento</span><button class="tg" data-act="rm"><span>Reduzir animações<br><small>Remove transições e entradas animadas.</small></span><i class="sw2 ${cfg.rm?'on':''}"></i></button></div>`,
+ voz:()=>`<h1 class="disp">Voz e vídeo</h1><div class="sec"><span class="tag">Microfone</span><select id="smic" aria-label="Microfone"><option value="">Padrão do sistema</option></select><small>Vale a partir da próxima call. Se a lista vier vazia, entre em uma call uma vez para autorizar o microfone.</small></div>
+  <button class="tg" data-act="ns"><span>Reduzir ruído de fundo</span><i class="sw2 ${cfg.ns?'on':''}"></i></button>
+  <div class="sec"><span class="tag">Compartilhamento de tela</span><select id="sq" aria-label="Qualidade padrão">${qopts.map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select><small>Mais qualidade usa mais internet e processador. Cada pessoa assistindo é uma transmissão separada.</small></div>`,
+ sobre:()=>`<h1 class="disp">Sobre</h1><div class="sec"><span class="tag">Versão</span><b class="disp" style="font-size:44px">ECHOO ${esc(APP_VERSION.startsWith('__')?'':APP_VERSION)}</b><small id="ver2"></small><p class="mu">Chat e comunidades com servidor central: contas, amigos, mensagens guardadas, servidores com cargos e canais, e call com compartilhamento de tela.</p></div>`};
+function openSettings(sec){if(sec)setSec=sec;pend={a:me.avatar||'',b:me.banner||''};$('set').hidden=false;$('pop').hidden=true;renderSettings()}
+function renderSettings(){const nav=[['conta','Minha conta'],['perfil','Perfil'],['aparencia','Aparência'],['voz','Voz e vídeo'],['sobre','Sobre']];
+  $('set').innerHTML=`<div id="sn"><div class="sc"><span>${av(me.code,40,me.name,1)}</span><div class="un"><b>${esc(me.name)}</b><small>#${esc(me.tag)}</small></div></div><div class="tag mu">Usuário</div>${nav.map(([k,l])=>`<button class="sni ${setSec==k?'on':''}" data-act="sn" data-k="${k}">${l}</button>`).join('')}<div class="tag mu">Aplicativo</div><button class="sni rd" data-act="wipe">Sair da conta</button></div><div id="sc"><div class="rv">${SEC[setSec]()}</div></div><div id="sx"><button class="ib" data-act="sx" aria-label="Fechar">${ic('close')}</button><span class="tag mu">ESC</span></div>`;
+  if(setSec=='voz'){$('sq').value=cfg.q;fillMics()}
+  if(setSec=='sobre'&&window.api&&api.version)api.version().then(v=>{const e=$('ver2');if(e)e.textContent='Aplicativo de computador '+v})}
+async function fillMics(){const s=$('smic');if(!s)return;try{const ds=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind=='audioinput'&&d.deviceId&&d.deviceId!='default');
+  s.innerHTML='<option value="">Padrão do sistema</option>'+ds.map(d=>`<option value="${esc(d.deviceId)}">${esc(d.label||'Microfone')}</option>`).join('');s.value=cfg.mic}catch(e){}}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',e=>{const t=e.target,b=t.closest('[data-act]');
+  if(!t.closest('#pop')&&!(b&&['upop','smenu'].includes(b.dataset.act)))$('pop').hidden=true;
+  if(!b)return;const a=b.dataset.act,d=b.dataset,s=srvById(d.s||cs),c=s&&s.chans.find(x=>x.id==d.c);
+  switch(a){
+  case 'home':cs=null;cur=null;renderAll();break;
+  case 'dm':open_(dm(d.d));break;
+  case 'srv':{const k=(lastCh[s.id]||'').split(':')[1],x=s.chans.find(y=>y.id==k&&y.t=='t')||s.chans.find(y=>y.t=='t');cs=s.id;open_(srvCh(s,x));break}
+  case 'ch':if(c)open_(srvCh(s,c));break;
+  case 'vch':if(c){const k=s.id+':'+c.id;inCall&&inCall.id==k?leaveCall():joinCall(srvCh(s,c))}break;
+  case 'tab':tab=d.k;renderHome();break;
+  case 'acc':wsend({t:'reqAcc',from:d.c});break;
+  case 'dec':wsend({t:'reqDec',from:d.c});break;
+  case 'cnl':wsend({t:'reqCnl',to:d.c});break;
+  case 'unf':confirmM('Remover '+nameOf(d.c)+' dos amigos?',()=>wsend({t:'unf',code:d.c}),'Remover');break;
+  case 'req':sendReq(d.c);break;
+  case 'joink':{const o=chByKey(d.k);if(o)o.ch.k=='dm'?startRing(o.ch):joinCall(o.ch);break}
+  case 'call':if(cur)startRing(cur);break;
+  case 'ra':acceptRing();break;case 'rd':declineRing();break;case 'rc':cancelRing();break;
+  case 'addsrv':newServer();break;
+  case 'smenu':$('pop').hidden||$('pop').className!='sv'?srvMenu():$('pop').hidden=true;break;
+  case 'upop':$('pop').hidden||$('pop').className=='sv'?userPop():$('pop').hidden=true;break;
+  case 'newch':{const sv=srvById(cs);if(sv&&canManage(sv))newCh(sv,d.t)}break;
+  case 'invite':{const sv=srvById(cs);sv&&inviteM(sv)}break;
+  case 'ssett':{const sv=srvById(cs);sv&&srvSettings(sv)}break;
+  case 'leavesrv':{const sv=srvById(cs);sv&&leaveSrv(sv)}break;
+  case 'delsrv':{const sv=srvById(cs);sv&&delSrv(sv)}break;
+  case 'status':wsend({t:'prof',status:d.k});break;
+  case 'prof':openSettings('perfil');break;case 'set':openSettings();break;
+  case 'sn':setSec=d.k;renderSettings();break;case 'sx':$('set').hidden=true;break;
+  case 'theme':cfg.theme=d.k;saveCfg();applyTheme();renderSettings();break;
+  case 'pal':cfg.pal=d.k;saveCfg();applyTheme();renderSettings();break;
+  case 'rm':cfg.rm=!cfg.rm;saveCfg();applyTheme();renderSettings();break;
+  case 'ns':cfg.ns=!cfg.ns;saveCfg();renderSettings();break;
+  case 'psave':wsend({t:'prof',name:($('pn').value.trim()||me.name).slice(0,20),tag:$('pt').value,avatar:pend.a,banner:pend.b});st('Perfil salvo.');break;
+  case 'wipe':confirmM('Sair da conta neste dispositivo?',()=>{wsend({t:'logout',token:tok});try{localStorage.removeItem('d2tok')}catch(x){}location.reload()},'Sair');break;
+  case 'mic':toggleMic();break;case 'deaf':toggleDeaf();break;
+  case 'scr':screenStream?stopShare():pick();break;
+  case 'leave':leaveCall();break;case 'fs':fsToggle();break;case 'stopv':stopShare();break;
+  case 'card':showProfile(d.c);break;
+  case 'code':try{navigator.clipboard.writeText(me.user);st('Usuário copiado.')}catch(x){}break;
+  case 'amode':authMode=d.m||'login';showAuth('');break;
+  case 'chpw':wsend({t:'chpw',old:$('pw_old').value,pass:$('pw_new').value});break;
+  case 'recgen':wsend({t:'recGen',pass:$('rc_pw').value});break}
+  if(a!='upop'&&a!='smenu')$('pop').hidden=true});
+document.addEventListener('change',async e=>{const t=e.target;
+  if(t.id=='pfb'&&t.files[0]){pend.b=await imgJpeg(t.files[0],480,160,.8);$('pbn').style.cssText=bnStyle(pend.b)}
+  if(t.id=='pfa'&&t.files[0]){pend.a=await imgJpeg(t.files[0],128,128,.85);$('pav').innerHTML=`<img class="av" src="${burl(pend.a)}" alt="">`}
+  if(t.id=='sq'){cfg.q=t.value;saveCfg()}if(t.id=='smic'){cfg.mic=t.value;saveCfg()}});
+document.addEventListener('submit',e=>{
+  if(e.target.id=='af'){e.preventDefault();const v=$('ac').value.trim();if(v.length>=2)wsend({t:'search',q:v});else st('Digite pelo menos 2 letras.')}
+  if(e.target.id=='af2'){e.preventDefault();const s=$('a_srv');if(s){try{localStorage.setItem('d2srv',JSON.stringify(s.value.trim()))}catch(x){}}
+    const o={t:authMode=='login'?'login':authMode=='reg'?'register':'reset',user:$('a_user').value.trim(),pass:$('a_pass').value};if(authMode=='reg')o.name=$('a_name').value.trim();if(authMode=='forgot')o.code=$('a_code').value.trim();
+    $('aerr').textContent='Conectando…';if(ws&&ws.readyState==1){wsend(o)}else{pendingAuth=o;if(!ws||ws.readyState>1)connect()}}});
+$('sf').onsubmit=e=>{e.preventDefault();const raw=$('q').value.trim();if(!raw)return;const q=raw.toLowerCase(),l=friends.filter(f=>(f.name||'').toLowerCase().includes(q));
+  if(l.length==1)open_(dm(l[0].code));else if(!l.length){tab='add';cs=null;cur=null;renderAll();$('ac')&&($('ac').value=raw);wsend({t:'search',q:raw})}$('q').value='';renderSide()};
+$('q').oninput=renderSide;$('hq').oninput=renderHome;
+$('f').onsubmit=e=>{e.preventDefault();const m=$('inp').value.trim();if(!m||!cur)return;$('inp').value='';wsend({t:'msg',c:cur.id,m})};
+addEventListener('keydown',e=>{if(e.key!='Escape')return;if($('modal').classList.contains('on'))$('modal').classList.remove('on');else if(!$('pop').hidden)$('pop').hidden=true;else if(!$('set').hidden)$('set').hidden=true});
+
+function showUpd(text,label,fn){$('updt').textContent=text;$('updb').textContent=label;$('updb').onclick=fn;$('upd').hidden=false}
+function checkVer(v){if(!APP_VERSION.startsWith('__')&&v&&v!=APP_VERSION)showUpd('Há uma nova versão do ECHOO ('+v+').','Atualizar agora',()=>location.reload())}
+function showRec(code,reset){modal(`<h3 class="disp">${reset?'Senha redefinida':'Guarde seu código de recuperação'}</h3><p class="mu">Se você esquecer a senha, este código é o único jeito de recuperar a conta. Ele aparece só agora: anote em um lugar seguro.</p><div class="reccode">${esc(code)}</div><div><button type="button" class="btn sm" id="rcp">Copiar código</button></div>`,()=>{},'Guardei meu código',true);
+  $('rcp').onclick=()=>{try{navigator.clipboard.writeText(code);st('Código copiado.')}catch(e){}}}
+if(window.api&&api.onUpdate)api.onUpdate(u=>{if(u.state=='ready')showUpd('Atualização '+u.version+' do aplicativo pronta.','Reiniciar e atualizar',()=>api.installUpdate());else if(u.state=='available')st('Baixando a atualização '+u.version+'…')});
+if(tok&&srvBase())connect();else showAuth('');
+</script></body></html>

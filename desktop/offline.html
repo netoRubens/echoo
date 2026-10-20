@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="pt-BR"><meta charset="utf-8"><title>ECHOO</title>
+<style>*{margin:0;box-sizing:border-box}html,body{height:100%}body{background:#EEE6DD;color:#1E140B;font:15px/1.5 system-ui,Arial,sans-serif;display:grid;place-items:center;padding:24px}
+.w{max-width:440px;display:grid;gap:16px}.t{font-weight:800;letter-spacing:.14em;text-transform:uppercase;font-size:11px;color:#D8082F}
+h1{font:400 56px/.95 Anton,Impact,"Arial Narrow Bold",sans-serif;text-transform:uppercase}
+button{justify-self:start;border:2px solid #D8082F;background:#D8082F;color:#EEE6DD;padding:12px 22px;font:400 16px Anton,Impact,sans-serif;letter-spacing:.04em;text-transform:uppercase;cursor:pointer}
+button:hover{background:transparent;color:#D8082F}</style>
+<div class="w"><span class="t">Sem conexão</span><h1 id="h">Não conseguimos falar com o servidor</h1><p id="p">Confira sua internet. Se o servidor estiver "acordando", pode levar até um minuto.</p>
+<button onclick="api.retry()">Tentar novamente</button></div>
+<script>if(location.search.includes('m=config')){h.textContent='Servidor não configurado';p.textContent='Este instalador foi gerado sem o endereço do servidor. Avise quem mantém o ECHOO.'}</script></html>

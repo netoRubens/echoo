@@ -1,0 +1,12 @@
+ECHOO - PROGRAMA DE COMPUTADOR (Windows)
+
+Este programa e uma casca que abre o app do servidor (config.json -> "server").
+Por isso o programa, o app online e o site sempre mostram a mesma versao.
+
+TESTAR LOCALMENTE
+  npm install
+  npm start            (abre a janela apontando para o servidor do config.json)
+  ou: GERAR-INSTALADOR.bat  (gera dist\ECHOO-Setup.exe de teste)
+
+A VERSAO OFICIAL sai pelo GitHub: na raiz do repositorio rode  node release.js 1.5.0
+Quem ja tem o programa instalado recebe a atualizacao sozinho.
