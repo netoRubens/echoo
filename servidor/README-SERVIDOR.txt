@@ -44,7 +44,7 @@ O que ele faz
 
 5) SITE E VERSAO
    O site le a versao e o link de download em /api/version, que vem de servidor/version.json.
-   Para lancar uma versao nova use `node release.js 1.5.0` na raiz do repositorio (veja o README.md).
+   Para lancar versoes use `node release.js 1.5.0` (ou com --programa); veja o README.md.
 
 Seguranca e limites
 - Senhas nunca sao guardadas em texto; ha limite de tentativas de login e de criacao de contas por IP.

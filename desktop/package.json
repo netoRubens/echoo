@@ -6,17 +6,14 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win nsis --publish never",
-    "release": "electron-builder --win nsis --publish always"
+    "build": "electron-builder --win dir --publish never"
   },
-  "dependencies": { "electron-updater": "^6.3.9" },
   "devDependencies": { "electron": "^31.0.0", "electron-builder": "^24.13.3" },
   "build": {
     "appId": "com.echoo.app",
     "productName": "ECHOO",
-    "files": ["main.js", "preload.js", "loading.html", "offline.html", "config.json"],
-    "win": { "target": "nsis", "signAndEditExecutable": false, "artifactName": "ECHOO-Setup.${ext}" },
-    "nsis": { "oneClick": true, "perMachine": false, "createDesktopShortcut": true, "runAfterFinish": true },
-    "publish": { "provider": "github", "owner": "netoRubens", "repo": "echoo", "releaseType": "release" }
+    "copyright": "Copyright © ECHOO",
+    "files": ["main.js", "preload.js", "updater.js", "loading.html", "offline.html", "glyph-cream.png", "config.json", "build/icon.png"],
+    "win": { "target": "dir", "icon": "build/icon.ico" }
   }
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-t="light"><head><meta charset="utf-8"><title>ECHOO</title>
+<link rel="icon" href="../brand/favicon.ico" sizes="any"><link rel="icon" type="image/png" href="../brand/favicon-32.png" sizes="32x32"><link rel="apple-touch-icon" href="../brand/apple-touch-icon.png"><link rel="manifest" href="../brand/manifest.webmanifest"><meta name="theme-color" content="#D8082F">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
@@ -158,6 +159,7 @@ video{width:100%;height:100%;object-fit:contain;background:#000}
 .reccode{font:800 24px/1.3 var(--body);letter-spacing:.1em;border:2px dashed var(--fg);padding:14px;text-align:center;user-select:all}
 #upd{position:fixed;top:10px;left:50%;transform:translateX(-50%);background:var(--red);color:var(--on);padding:8px 8px 8px 16px;display:flex;gap:14px;align-items:center;z-index:65;font-weight:600;box-shadow:4px 4px 0 rgba(0,0,0,.3)}
 #upd .btn{color:var(--on)}
+.gl{display:inline-block;width:22px;height:22px;background:currentColor;-webkit-mask:url(../brand/glyph.png) center/contain no-repeat;mask:url(../brand/glyph.png) center/contain no-repeat}.ri .gl{width:26px;height:26px}
 </style></head><body>
 <nav id="rail" aria-label="Servidores"></nav>
 <aside id="side">
@@ -274,7 +276,7 @@ function connect(){const b=srvBase();if(!b)return showAuth('Informe o endereço 
   ws.onerror=()=>{}}
 function showAuth(msg){const a=$('auth');a.hidden=false;const needSrv=!location.protocol.startsWith('http'),m=authMode;
   const T={login:['Entrar','Bem-vindo de volta!','Que bom te ver de novo.'],reg:['Criar conta','Crie sua conta','Leva menos de um minuto.'],forgot:['Recuperar acesso','Redefinir senha','Use o código de recuperação que você recebeu ao criar a conta.']}[m];
-  a.innerHTML=`<div class="ah"><span class="tag">Chat e comunidades</span><b class="disp">ECHOO</b></div><form id="af2" class="ab"><span class="tag mu">${T[0]}</span><h1 class="disp">${T[1]}</h1><p class="mu">${T[2]}</p>
+  a.innerHTML=`<div class="ah"><div><i class="gl" style="width:60px;height:60px"></i><br><br><span class="tag">Chat e comunidades</span></div><b class="disp">ECHOO</b></div><form id="af2" class="ab"><span class="tag mu">${T[0]}</span><h1 class="disp">${T[1]}</h1><p class="mu">${T[2]}</p>
   ${needSrv?`<label class="fl"><span class="tag">Servidor</span><input id="a_srv" value="${esc(srvBase())}" placeholder="https://seu-servidor" autocomplete="off"></label>`:''}
   <label class="fl"><span class="tag">Nome de usuário <i class="rq">*</i></span><input id="a_user" autocomplete="username" maxlength="20" required></label>
   ${m=='reg'?`<label class="fl"><span class="tag">Nome de exibição</span><input id="a_name" maxlength="20" placeholder="Como os amigos vão te ver"></label>`:''}
@@ -331,7 +333,7 @@ function fixDm(){if(cur&&cur.k=='dm'&&!friends.find(f=>cur.id==dm(f.code).id))cu
 /* ---------- renderização ---------- */
 function renderAll(){fixCur();renderRail();renderSide();renderMe();renderMain();updateUI()}
 function renderMe(){$('uav').innerHTML=`<span class="avw">${av(me.code,34,me.name,1)}<i class="dot ${myStat()}" style="border-color:var(--bg2)"></i></span>`;$('myname').textContent=me.name;$('mytag').textContent='#'+me.tag}
-function renderRail(){$('rail').innerHTML=`<div class="rw ${!cs?'on':''}"><button class="ri" data-act="home" title="Início">E</button></div><div class="rs"></div>`+
+function renderRail(){$('rail').innerHTML=`<div class="rw ${!cs?'on':''}"><button class="ri" data-act="home" title="Início" aria-label="Início"><i class="gl"></i></button></div><div class="rs"></div>`+
   srvs.map(s=>{const live=s.chans.some(c=>c.t=='v'&&active[s.id+':'+c.id]&&active[s.id+':'+c.id].size);
     return `<div class="rw ${cs==s.id?'on':''}"><button class="ri" data-act="srv" data-s="${esc(s.id)}" title="${esc(s.name)}">${s.icon?`<img src="${burl(s.icon)}" alt="">`:esc(s.name.slice(0,2).toUpperCase())}${live?'<i class="bd"></i>':''}</button></div>`}).join('')+
   `<div class="rw"><button class="ri" data-act="addsrv" title="Criar servidor">${ic('plus')}</button></div>`}
@@ -346,7 +348,7 @@ function renderSide(){const s=cs&&srvById(cs);$('sf').hidden=!!s;$('svh').hidden
     h=`<button class="it ${!cur?'sel':''}" data-act="home"><span class="hi">${ic('user')}</span><span class="nm">Amigos</span>${pend?`<i class="nb">${pend}</i>`:''}</button><div class="lb tag"><span>Mensagens diretas</span><span>${String(friends.length).padStart(2,'0')}</span></div>`+
     list.map(f=>{const live=active[dm(f.code).id]&&active[dm(f.code).id].size;return `<button class="it ${cur&&cur.id==dm(f.code).id?'sel':''}" data-act="dm" data-d="${esc(f.code)}"><span class="avw">${av(f.code,30,f.name,1)}<i class="dot ${stat(f.code)}"></i></span><span class="nm">${esc(f.name)}</span>${live?'<span class="pl">AO VIVO</span>':''}</button>`}).join('')+
     (extra.length?`<div class="lb tag"><span>Pessoas dos seus servidores</span></div>`+extra.map(f=>`<button class="it" data-act="req" data-c="${esc(f.code)}"><span class="nm">${esc(f.name)}</span><span class="pl">+ Pedir</span></button>`).join(''):'')+
-    (q&&!list.length&&!extra.length?`<div class="it mu">Enter para enviar pedido ao código “${esc(raw)}”</div>`:'')}
+    (q&&!list.length&&!extra.length?`<div class="it mu">Enter para buscar “${esc(raw)}” entre todos os usuários</div>`:'')}
   $('sl').innerHTML=h}
 function renderMain(){const c=!!cur;$('home').hidden=c;$('chatcol').hidden=!c;
   if(c){$('title').textContent=(cur.k=='dm'?'@ ':'# ')+cur.name;const s=cur.sid&&srvById(cur.sid);$('tdesc').textContent=s?(s.desc||s.name):'Conversa direta'}else renderHome()}
@@ -360,7 +362,7 @@ function renderHome(){const pend=reqs.filter(r=>r.dir=='in').length;
     h=`<div class="tag mu">Recebidos — ${String(i.length).padStart(2,'0')}</div>`+(i.length?i.map(r=>`<div class="fr rv"><span class="avw">${av(r.code,40,r.name,1)}</span><div class="un"><b>${esc(r.name||r.code)}</b><small>Quer ser seu amigo</small></div><button class="ib rnd ok" data-act="acc" data-c="${esc(r.code)}" title="Aceitar">${ic('check')}</button><button class="ib rnd no" data-act="dec" data-c="${esc(r.code)}" title="Recusar">${ic('close')}</button></div>`).join(''):'<p class="mu">Nenhum pedido recebido.</p>')+
     `<div class="tag mu" style="margin-top:18px">Enviados — ${String(o.length).padStart(2,'0')}</div>`+(o.length?o.map(r=>`<div class="fr rv"><span class="avw">${av(r.code,40,r.name,1)}</span><div class="un"><b>${esc(r.name||r.code)}</b><small>Aguardando resposta</small></div><button class="ib rnd no" data-act="cnl" data-c="${esc(r.code)}" title="Cancelar">${ic('close')}</button></div>`).join(''):'<p class="mu">Nenhum pedido enviado.</p>')}
   else{const l=friends.filter(f=>(tab=='all'||stat(f.code)!='offline')&&(!q||(f.name||'').toLowerCase().includes(q)));
-    h=`<div class="tag mu">${tab=='all'?'Todos os amigos':'Online'} — ${String(l.length).padStart(2,'0')}</div>`+(l.length?l.map((f,i)=>`<div class="fr"><span class="n tag">${String(i+1).padStart(2,'0')}</span><span class="avw">${av(f.code,40,f.name,1)}<i class="dot ${stat(f.code)}" style="border-color:var(--bg)"></i></span><div class="un"><b>${esc(f.name)}</b><small>${SN[stat(f.code)]}</small></div><button class="ib rnd" data-act="dm" data-d="${esc(f.code)}" title="Mensagem">${ic('chat')}</button><button class="ib rnd" data-act="unf" data-c="${esc(f.code)}" title="Remover amigo">${ic('trash')}</button></div>`).join(''):`<p class="mu" style="max-width:52ch">${friends.length?'Ninguém online agora.':'Você ainda não tem amigos. Use “Adicionar amigo” e envie um pedido com o código de quem quer conversar.'}</p>`)}
+    h=`<div class="tag mu">${tab=='all'?'Todos os amigos':'Online'} — ${String(l.length).padStart(2,'0')}</div>`+(l.length?l.map((f,i)=>`<div class="fr"><span class="n tag">${String(i+1).padStart(2,'0')}</span><span class="avw">${av(f.code,40,f.name,1)}<i class="dot ${stat(f.code)}" style="border-color:var(--bg)"></i></span><div class="un"><b>${esc(f.name)}</b><small>${SN[stat(f.code)]}</small></div><button class="ib rnd" data-act="dm" data-d="${esc(f.code)}" title="Mensagem">${ic('chat')}</button><button class="ib rnd" data-act="unf" data-c="${esc(f.code)}" title="Remover amigo">${ic('trash')}</button></div>`).join(''):`<p class="mu" style="max-width:52ch">${friends.length?'Ninguém online agora.':'Você ainda não tem amigos. Use “Adicionar amigo”, busque pelo nome de usuário e envie o pedido.'}</p>`)}
   $('hb').innerHTML=h;$('hb').dataset.t=tab;renderSres()}
 function renderSres(){const el=$('sres');if(!el)return;if(!sres){el.innerHTML='';return}
   el.innerHTML=`<div class="tag mu" style="margin-top:18px">Resultados para “${esc(sres.q)}” — ${String(sres.users.length).padStart(2,'0')}</div>`+(sres.users.length?sres.users.map(u=>{const rel=friends.find(f=>f.code==u.code)?'f':reqs.find(r=>r.code==u.code&&r.dir=='out')?'o':reqs.find(r=>r.code==u.code&&r.dir=='in')?'i':'';
@@ -470,7 +472,7 @@ function stopShare(){if(!screenStream)return;screenStream.getTracks().forEach(t=
 function openPop(html,cls){const p=$('pop');p.className=cls||'';p.innerHTML=html;p.hidden=false}
 function userPop(){const sts=[['online','Disponível'],['idle','Ausente'],['dnd','Não perturbe'],['invisible','Invisível']];
   openPop(`<div class="bn" style="${bnStyle(me.banner,me.code)}"></div><div class="pc">${av(me.code,64,me.name,1)}<i class="dot ${myStat()}"></i></div><div class="pb"><b class="disp">${esc(me.name)}</b><br><small>@${esc(me.user)} · #${esc(me.tag)}</small></div>
-  <div class="pl2"><button data-act="prof">${ic('user')} Editar perfil</button><button data-act="set">${ic('gear')} Configurações</button><button data-act="code">Copiar meu código</button></div>
+  <div class="pl2"><button data-act="prof">${ic('user')} Editar perfil</button><button data-act="set">${ic('gear')} Configurações</button><button data-act="code">Copiar meu usuário</button></div>
   <div class="pl2">${sts.map(([k,l])=>`<button data-act="status" data-k="${k}"><i class="dot ${k=='invisible'?'offline':k}" style="position:static;border-color:var(--bg);flex:none"></i> ${l}${me.status==k?' ✓':''}</button>`).join('')}</div>`)}
 function srvMenu(){const s=srvById(cs);if(!s)return;const mg=canManage(s);
   openPop((mg?`<button data-act="invite">Convidar amigos</button><button data-act="ssett">Configurações do servidor</button><button data-act="newch" data-t="t">Criar canal</button>`:'')+(s.owner==me.code?`<button class="rd" data-act="delsrv">Excluir servidor</button>`:`<button class="rd" data-act="leavesrv">Sair do servidor</button>`),'sv')}

@@ -1,5 +1,6 @@
 const { app, BrowserWindow, session, desktopCapturer, ipcMain, shell } = require('electron');
 const path = require('path'), fs = require('fs');
+const upd = require('./updater');
 
 // O programa abre o MESMO app que está no servidor (como o site): atualiza junto, sem divergência.
 let SERVER = process.env.ECHOO_SERVER || '';
@@ -7,11 +8,12 @@ try { SERVER = SERVER || JSON.parse(fs.readFileSync(path.join(__dirname, 'config
 SERVER = String(SERVER).trim().replace(/\/+$/, '');
 let ORIGIN = ''; try { ORIGIN = new URL(SERVER).origin; } catch (e) {}
 const APP_URL = ORIGIN ? ORIGIN + '/app/' : '';
+let GH = ''; try { GH = JSON.parse(fs.readFileSync(path.join(__dirname, 'config.json'), 'utf8')).github || ''; } catch (e) {}   // usuario/repositorio das Releases
 
 app.commandLine.appendSwitch('disable-renderer-backgrounding');
 if (!app.requestSingleInstanceLock()) app.quit();
 
-let win = null, lastUpd = null;
+let win = null, lastUpd = null, pending = null;
 const page = n => path.join(__dirname, n);
 const fromApp = e => { try { return new URL(e.senderFrame.url).origin === ORIGIN; } catch (x) { return false; } };
 
@@ -23,7 +25,7 @@ ipcMain.handle('sources', async e => {
 });
 ipcMain.handle('app-version', () => app.getVersion());
 ipcMain.on('retry', () => load());
-ipcMain.on('install-update', () => { try { require('electron-updater').autoUpdater.quitAndInstall(); } catch (e) {} });
+ipcMain.on('install-update', () => { if (pending) { upd.install(pending.file); app.quit(); } });
 
 function load() {
   if (!win) return;
@@ -32,16 +34,14 @@ function load() {
 }
 const tell = d => { lastUpd = d; if (win && !win.isDestroyed()) win.webContents.send('update', d); };
 
-// Atualização automática do programa (instalador) via GitHub Releases
+// Atualização do programa: confere /api/version e, se houver instalador novo, baixa, valida o hash e avisa o app
 function setupUpdater() {
-  if (!app.isPackaged) return;
-  let au; try { au = require('electron-updater').autoUpdater; } catch (e) { return; }
-  au.autoDownload = true; au.autoInstallOnAppQuit = true;
-  au.on('update-available', i => tell({ state: 'available', version: i.version }));
-  au.on('update-downloaded', i => tell({ state: 'ready', version: i.version }));
-  au.on('error', e => console.error('atualizador:', e && e.message));
-  const check = () => au.checkForUpdates().catch(() => {});
-  check(); setInterval(check, 4 * 3600e3);
+  if (!app.isPackaged || !ORIGIN || !GH) return;
+  const run = async () => {
+    try { const r = await upd.check({ server: ORIGIN, current: app.getVersion(), repo: GH, dir: app.getPath('temp'), onState: tell }); if (r) { pending = r; tell({ state: 'ready', version: r.version }); } }
+    catch (e) { console.error('atualizador:', e.message); }
+  };
+  run(); setInterval(run, 4 * 3600e3);
 }
 
 app.whenReady().then(() => {
@@ -49,7 +49,7 @@ app.whenReady().then(() => {
   ses.setPermissionRequestHandler((wc, perm, cb, d) => { let r = false; try { r = ok.includes(perm) && new URL(d.requestingUrl).origin === ORIGIN; } catch (e) {} cb(r); });
   ses.setDisplayMediaRequestHandler((req, cb) => { desktopCapturer.getSources({ types: ['screen'] }).then(src => cb({ video: src[0], audio: 'loopback' })); });
   win = new BrowserWindow({
-    width: 1280, height: 780, minWidth: 900, minHeight: 600, backgroundColor: '#17110d', autoHideMenuBar: true, title: 'ECHOO',
+    width: 1280, height: 780, minWidth: 900, minHeight: 600, backgroundColor: '#17110d', autoHideMenuBar: true, title: 'ECHOO', icon: page('build/icon.png'),
     webPreferences: { preload: page('preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true, backgroundThrottling: false }
   });
   win.webContents.setWindowOpenHandler(({ url }) => { if (/^https?:/.test(url)) shell.openExternal(url); return { action: 'deny' }; });

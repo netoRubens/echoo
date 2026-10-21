@@ -300,11 +300,11 @@ function handle(ws, m) {
 }
 
 /* ---------- HTTP (site, app online e configuração) ---------- */
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.json': 'application/json', '.exe': 'application/octet-stream', '.zip': 'application/zip', '.mp4': 'video/mp4' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.webmanifest': 'application/manifest+json', '.ico': 'image/x-icon', '.json': 'application/json', '.exe': 'application/octet-stream', '.zip': 'application/zip', '.mp4': 'video/mp4' };
 const server = http.createServer((req, res) => {
   const url = new URL(req.url, 'http://x');
   if (url.pathname === '/health') { res.writeHead(200, { 'content-type': 'text/plain' }); return res.end('ok'); }
-  if (url.pathname === '/api/version') { const v = readVersion(); res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store', 'access-control-allow-origin': '*' }); return res.end(JSON.stringify({ version: v.version, download: v.download })); }
+  if (url.pathname === '/api/version') { const v = readVersion(); res.writeHead(200, { 'content-type': 'application/json', 'cache-control': 'no-store', 'access-control-allow-origin': '*' }); return res.end(JSON.stringify({ version: v.version, shell: v.shell || v.version, download: v.download })); }
   let p; try { p = decodeURIComponent(url.pathname); } catch (e) { res.writeHead(400); return res.end(); }
   const f = path.normalize(path.join(PUB, p.endsWith('/') ? p + 'index.html' : p));
   if (!f.startsWith(PUB)) { res.writeHead(403); return res.end(); }

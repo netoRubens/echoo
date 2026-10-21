@@ -1,4 +1,4 @@
-name: Gerar instalador do ECHOO
+name: Gerar instalador do ECHOO (Inno Setup)
 on:
   workflow_dispatch:
   push:
@@ -8,25 +8,54 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
-    defaults:
-      run:
-        working-directory: desktop
+    env:
+      CERT_B64: ${{ secrets.WINDOWS_CERT_BASE64 }}
+      CERT_PASS: ${{ secrets.WINDOWS_CERT_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install
-      - name: Gerar e publicar na Release (quando há tag vX.Y.Z)
+      - name: Dependências
+        working-directory: desktop
+        run: npm install
+      - name: Gerar o app (pasta win-unpacked, com ícone e informações do arquivo)
+        working-directory: desktop
+        run: npx electron-builder --win dir --publish never
+      - name: Assinar ECHOO.exe (só se houver certificado nos Secrets)
+        if: env.CERT_B64 != ''
+        shell: pwsh
+        run: |
+          [IO.File]::WriteAllBytes("$env:RUNNER_TEMP\cert.pfx", [Convert]::FromBase64String($env:CERT_B64))
+          $st = (Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter signtool.exe | Where-Object { $_.FullName -match '\\x64\\' } | Sort-Object FullName -Descending | Select-Object -First 1).FullName
+          & $st sign /f "$env:RUNNER_TEMP\cert.pfx" /p $env:CERT_PASS /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 desktop\dist\win-unpacked\ECHOO.exe
+      - name: Gerar o instalador com o Inno Setup
+        shell: pwsh
+        run: |
+          choco install innosetup -y --no-progress
+          $ver = (Get-Content desktop\package.json | ConvertFrom-Json).version
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" "/DAppVersion=$ver" desktop\installer\ECHOO.iss
+      - name: Assinar o instalador (só se houver certificado nos Secrets)
+        if: env.CERT_B64 != ''
+        shell: pwsh
+        run: |
+          $st = (Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter signtool.exe | Where-Object { $_.FullName -match '\\x64\\' } | Sort-Object FullName -Descending | Select-Object -First 1).FullName
+          & $st sign /f "$env:RUNNER_TEMP\cert.pfx" /p $env:CERT_PASS /fd SHA256 /tr http://timestamp.digicert.com /td SHA256 desktop\dist-installer\ECHOO-Setup.exe
+      - name: Hash de verificação (o programa confere antes de atualizar)
+        shell: pwsh
+        run: |
+          $f = "desktop\dist-installer\ECHOO-Setup.exe"
+          (Get-FileHash $f -Algorithm SHA256).Hash.ToLower() | Set-Content -NoNewline -Encoding ascii "$f.sha256"
+      - name: Publicar na Release
         if: startsWith(github.ref, 'refs/tags/v')
-        run: npm run release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Só gerar (teste manual)
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            desktop/dist-installer/ECHOO-Setup.exe
+            desktop/dist-installer/ECHOO-Setup.exe.sha256
+      - name: Guardar o instalador (teste manual)
         if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
-        run: npm run build
-      - uses: actions/upload-artifact@v4
-        if: ${{ !startsWith(github.ref, 'refs/tags/v') }}
+        uses: actions/upload-artifact@v4
         with:
           name: ECHOO-instalador
-          path: desktop/dist/*.exe
+          path: desktop/dist-installer/*
