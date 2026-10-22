@@ -1,0 +1,13 @@
+ECHOO - PROGRAMA DE COMPUTADOR (Windows)
+
+Casca que abre o app do servidor (config.json -> "server"). Por isso programa, app online e site
+mostram sempre a mesma versao.
+
+TESTAR
+  npm install
+  npm start                 abre a janela apontando para o servidor do config.json
+  GERAR-INSTALADOR.bat      gera dist-installer\ECHOO-Setup.exe (precisa do Inno Setup 6 instalado)
+
+INSTALADOR: installer\ECHOO.iss (abra no Inno Setup Compiler para editar).
+VERSAO OFICIAL: na raiz do repositorio, node release.js 1.5.0 --programa
+Veja o README.md na raiz (inclui a secao sobre antivirus e assinatura de codigo).

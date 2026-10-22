@@ -1,0 +1,19 @@
+{
+  "name": "echoo-desktop",
+  "version": "1.4.0",
+  "description": "ECHOO - chat e comunidades",
+  "author": "ECHOO",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win dir --publish never"
+  },
+  "devDependencies": { "electron": "^31.0.0", "electron-builder": "^24.13.3" },
+  "build": {
+    "appId": "com.echoo.app",
+    "productName": "ECHOO",
+    "copyright": "Copyright © ECHOO",
+    "files": ["main.js", "preload.js", "updater.js", "loading.html", "offline.html", "glyph-cream.png", "config.json", "build/icon.png"],
+    "win": { "target": "dir", "icon": "build/icon.ico" }
+  }
+}
