@@ -56,6 +56,19 @@ Chat e comunidades: contas, amigos, mensagens guardadas, servidores com cargos e
 
 Use `--programa` só quando precisar: cada instalador novo é um arquivo novo para os antivírus.
 
+## Atualizar quem já instalou (sem reinstalar)
+| O que mudou | O que seus amigos precisam fazer |
+|---|---|
+| site, app, servidor | **Nada.** Atualiza sozinho (o app mostra "Atualizar agora" se estiver aberto). |
+| janela, ícone, instalador (`--programa`) | **Nada.** O programa baixa o instalador novo da Release, confere o SHA-256 e atualiza sozinho. |
+| quem instalou a **versão antiga** (instalador NSIS, sem atualizador próprio) | **Uma vez só:** o app mostra "Há um novo instalador do ECHOO", é só clicar em *Baixar instalador* e executar. O instalador novo remove a versão antiga sozinho. Depois disso nunca mais. |
+
+Os dados ficam no servidor, então trocar de instalador não perde conta, amigos nem mensagens.
+Os ícones (janela, barra de tarefas, atalho, instalador) só mudam depois que a casca nova é instalada. Se o Windows
+continuar mostrando o ícone antigo, desafixe e fixe de novo na barra de tarefas (o Windows guarda ícones em cache).
+Na tela *Configurações > Sobre*, o número grande é a versão do site/app/servidor; o menor é a da janela/instalador.
+Eles podem ser diferentes de propósito: só o primeiro muda no dia a dia.
+
 ## Instalador com Inno Setup
 - **Na nuvem:** o workflow instala o Inno Setup e compila `desktop/installer/ECHOO.iss` sozinho.
 - **No seu PC:** instale o Inno Setup 6 (jrsoftware.org/isdl.php) e dê dois cliques em `desktop/GERAR-INSTALADOR.bat`. Ele gera o app e compila o instalador em `desktop/dist-installer/ECHOO-Setup.exe`.

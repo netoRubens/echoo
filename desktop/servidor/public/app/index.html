@@ -297,7 +297,7 @@ function onMsg(d){switch(d.t){
     reqs=[...d.reqIn.map(u=>({...u,dir:'in'})),...d.reqOut.map(u=>({...u,dir:'out'}))];srvs=d.servers;active={};for(const k in d.voice)active[k]=new Set(d.voice[k]);
     $('auth').hidden=true;setConn(true);booted=true;
     if(inCall){Object.keys(pcs).forEach(closePc);wsend({t:'vj',c:inCall.id})}
-    fixCur();renderAll();needProfs();if(cur)wsend({t:'hist',c:cur.id});checkVer(d.ver);if(pendingRec){showRec(pendingRec.code,pendingRec.reset);pendingRec=null}break}
+    fixCur();renderAll();needProfs();if(cur)wsend({t:'hist',c:cur.id});checkVer(d.ver);checkShell(d);if(pendingRec){showRec(pendingRec.code,pendingRec.reset);pendingRec=null}break}
   case 'me':me=d.me;renderAll();if(!$('set').hidden)renderSettings();break;
   case 'friend':{const f=d.f,i=friends.findIndex(x=>x.code==f.code);i<0?friends.push(f):friends[i]=f;online[f.code]=f.on?1:0;reqs=reqs.filter(r=>r.code!=f.code);renderSres();sched();break}
   case 'frDel':friends=friends.filter(f=>f.code!=d.code);delete online[d.code];fixDm();renderSres();sched();break;
@@ -531,7 +531,7 @@ function openSettings(sec){if(sec)setSec=sec;pend={a:me.avatar||'',b:me.banner||
 function renderSettings(){const nav=[['conta','Minha conta'],['perfil','Perfil'],['aparencia','Aparência'],['voz','Voz e vídeo'],['sobre','Sobre']];
   $('set').innerHTML=`<div id="sn"><div class="sc"><span>${av(me.code,40,me.name,1)}</span><div class="un"><b>${esc(me.name)}</b><small>#${esc(me.tag)}</small></div></div><div class="tag mu">Usuário</div>${nav.map(([k,l])=>`<button class="sni ${setSec==k?'on':''}" data-act="sn" data-k="${k}">${l}</button>`).join('')}<div class="tag mu">Aplicativo</div><button class="sni rd" data-act="wipe">Sair da conta</button></div><div id="sc"><div class="rv">${SEC[setSec]()}</div></div><div id="sx"><button class="ib" data-act="sx" aria-label="Fechar">${ic('close')}</button><span class="tag mu">ESC</span></div>`;
   if(setSec=='voz'){$('sq').value=cfg.q;fillMics()}
-  if(setSec=='sobre'&&window.api&&api.version)api.version().then(v=>{const e=$('ver2');if(e)e.textContent='Aplicativo de computador '+v})}
+  if(setSec=='sobre'&&window.api&&api.version)api.version().then(v=>{const e=$('ver2');if(e)e.textContent='Aplicativo de computador (janela e instalador) '+v+'. As novidades do app chegam sozinhas, sem reinstalar.'})}
 async function fillMics(){const s=$('smic');if(!s)return;try{const ds=(await navigator.mediaDevices.enumerateDevices()).filter(d=>d.kind=='audioinput'&&d.deviceId&&d.deviceId!='default');
   s.innerHTML='<option value="">Padrão do sistema</option>'+ds.map(d=>`<option value="${esc(d.deviceId)}">${esc(d.label||'Microfone')}</option>`).join('');s.value=cfg.mic}catch(e){}}
 
@@ -596,6 +596,10 @@ $('f').onsubmit=e=>{e.preventDefault();const m=$('inp').value.trim();if(!m||!cur
 addEventListener('keydown',e=>{if(e.key!='Escape')return;if($('modal').classList.contains('on'))$('modal').classList.remove('on');else if(!$('pop').hidden)$('pop').hidden=true;else if(!$('set').hidden)$('set').hidden=true});
 
 function showUpd(text,label,fn){$('updt').textContent=text;$('updb').textContent=label;$('updb').onclick=fn;$('upd').hidden=false}
+const cmpV=(a,b)=>{const x=String(a).split('.').map(n=>parseInt(n)||0),y=String(b).split('.').map(n=>parseInt(n)||0);for(let i=0;i<3;i++){const d=(x[i]||0)-(y[i]||0);if(d)return d>0?1:-1}return 0};
+// programa instalado de uma versão antiga (sem atualizador próprio): avisa para instalar o instalador novo uma vez
+function checkShell(d){if(!(window.api&&api.version)||api.hasUpdater||!d.shell||!d.download)return;
+  api.version().then(v=>{if(cmpV(d.shell,v)>0)showUpd('Há um novo instalador do ECHOO ('+d.shell+'). Instale uma vez para as próximas atualizações serem automáticas.','Baixar instalador',()=>window.open(d.download,'_blank'))}).catch(()=>{})}
 function checkVer(v){if(!APP_VERSION.startsWith('__')&&v&&v!=APP_VERSION)showUpd('Há uma nova versão do ECHOO ('+v+').','Atualizar agora',()=>location.reload())}
 function showRec(code,reset){modal(`<h3 class="disp">${reset?'Senha redefinida':'Guarde seu código de recuperação'}</h3><p class="mu">Se você esquecer a senha, este código é o único jeito de recuperar a conta. Ele aparece só agora: anote em um lugar seguro.</p><div class="reccode">${esc(code)}</div><div><button type="button" class="btn sm" id="rcp">Copiar código</button></div>`,()=>{},'Guardei meu código',true);
   $('rcp').onclick=()=>{try{navigator.clipboard.writeText(code);st('Código copiado.')}catch(e){}}}

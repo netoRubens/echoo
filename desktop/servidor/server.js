@@ -120,7 +120,7 @@ const presence = u => u.friends.forEach(f => toUser(f, { t: 'pres', code: u.id, 
 function sendInit(ws, u) {
   const vo = {}; for (const k in voice) { const a = access(u.id, k); if (a && a.type !== 't') vo[k] = [...voice[k]]; }
   send(ws, {
-    t: 'init', me: selfView(u), ice: ICE, ver: APP_VER,
+    t: 'init', me: selfView(u), ice: ICE, ver: APP_VER, shell: readVersion().shell || APP_VER, download: readVersion().download,
     friends: u.friends.map(f => db.users[f]).filter(Boolean).map(friendView),
     reqIn: db.reqs.filter(r => r.to === u.id).map(r => db.users[r.from]).filter(Boolean).map(x => pub(x)),
     reqOut: db.reqs.filter(r => r.from === u.id).map(r => db.users[r.to]).filter(Boolean).map(x => pub(x)),
